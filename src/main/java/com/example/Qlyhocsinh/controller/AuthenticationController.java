@@ -3,6 +3,7 @@ package com.example.Qlyhocsinh.controller;
 import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.AuthenticationRequest;
 import com.example.Qlyhocsinh.dto.request.IntrospectRequest;
+import com.example.Qlyhocsinh.dto.request.LogoutRequest;
 import com.example.Qlyhocsinh.dto.response.AuthenticationResponse;
 import com.example.Qlyhocsinh.dto.response.IntrospectResponse;
 import com.example.Qlyhocsinh.service.AuthenticationService;
@@ -40,5 +41,11 @@ public class AuthenticationController {
         return ApiResponse.<IntrospectResponse>builder()
                 .result(result)
                 .build();
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder().build();
     }
 }

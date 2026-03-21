@@ -1,6 +1,7 @@
 package com.example.Qlyhocsinh.config;
 
 import com.example.Qlyhocsinh.enums.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,11 +29,15 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
         "/users",
         "/auth/log-in",
-        "/auth/introspect"
+        "/auth/introspect",
+        "/auth/logout"
     };
 
     @Value("${jwt.signerKey}")
     private String signerKey;
+
+    @Autowired
+    CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -41,7 +46,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder))
         );
 
         http.csrf(AbstractHttpConfigurer::disable);
@@ -60,14 +65,7 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-    @Bean
-    JwtDecoder jwtDecoder(){
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    };
+
 
     @Bean
     PasswordEncoder passwordEncoder(){

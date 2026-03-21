@@ -39,7 +39,19 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
+        if(request.getRoles() != null && !request.getRoles().isEmpty()){
+            request.getRoles().forEach(role -> {
+                try {
+                    Role.valueOf(role);
+                    roles.add(role);
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Role không hợp lệ: " + role);
+                }
+            });
+        }
+        else {
+            roles.add(Role.USER.name());
+        }
 
         user.setRoles(roles);
 

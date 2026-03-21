@@ -31,10 +31,10 @@ public class User {
 
     private LocalDateTime createdAt;
 
-//    @PrePersist
-//    protected void onCreate() {
-//        this.createdAt = LocalDateTime.now();
-//    }
+    @PrePersist
+    protected void onCreate(){
+        this.createdAt = LocalDateTime.now();
+    }
 
 }
 
