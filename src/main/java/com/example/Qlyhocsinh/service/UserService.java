@@ -36,33 +36,18 @@ public class UserService {
 
     PasswordEncoder passwordEncoder;
 
-    public UserResponse createUser(UserCreationRequest request){
-        if(userRepository.findByUsername(request.getUsername()).isPresent()){
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
-        }
-
-        User user = userMapper.toUser(request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        HashSet<String> roles = new HashSet<>();
-        if(request.getRoles() != null && !request.getRoles().isEmpty()){
-            request.getRoles().forEach(role -> {
-                try {
-                    Role.valueOf(role);
-                    roles.add(role);
-                } catch (IllegalArgumentException e) {
-                    throw new RuntimeException("Role không hợp lệ: " + role);
-                }
-            });
-        }
-        else {
-            roles.add(Role.USER.name());
-        }
-
-        user.setRoles(roles);
-
-        return userMapper.toUserResponse(userRepository.save(user));
-    }
+//    public UserResponse createUser(UserCreationRequest request){
+//        if(userRepository.findByUsername(request.getUsername()).isPresent()){
+//            throw new AppException(ErrorCode.USERNAME_EXISTED);
+//        }
+//
+//        User user = userMapper.toUser(request);
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//
+//        user.setRole(Role.USER.name());
+//
+//        return userMapper.toUserResponse(userRepository.save(user));
+//    }
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers(){

@@ -23,12 +23,12 @@ import java.util.List;
 public class UserController {
     private UserService userService;
 
-    @PostMapping
-    ApiResponse<UserResponse> createUser(@Valid @RequestBody UserCreationRequest request) {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.createUser(request))
-                .build();
-    }
+//    @PostMapping
+//    ApiResponse<UserResponse> createUser(@Valid @RequestBody UserCreationRequest request) {
+//        return ApiResponse.<UserResponse>builder()
+//                .result(userService.createUser(request))
+//                .build();
+//    }
 
     @GetMapping
     ApiResponse<List<UserResponse>> getUsers(){

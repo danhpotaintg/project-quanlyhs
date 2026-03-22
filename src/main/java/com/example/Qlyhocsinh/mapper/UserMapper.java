@@ -1,5 +1,7 @@
 package com.example.Qlyhocsinh.mapper;
 
+import com.example.Qlyhocsinh.dto.request.StudentCreationRequest;
+import com.example.Qlyhocsinh.dto.request.TeacherCreationRequest;
 import com.example.Qlyhocsinh.dto.request.UserCreationRequest;
 import com.example.Qlyhocsinh.dto.request.UserUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.UserResponse;
@@ -9,7 +11,9 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    User toUser(UserCreationRequest request);
+    User toUser(StudentCreationRequest request);
+
+    User toUser(TeacherCreationRequest request);
     UserResponse toUserResponse(User user);
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
 }
