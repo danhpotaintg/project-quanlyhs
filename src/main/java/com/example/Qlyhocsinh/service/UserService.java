@@ -5,6 +5,8 @@ import com.example.Qlyhocsinh.dto.request.UserUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.UserResponse;
 import com.example.Qlyhocsinh.entity.User;
 import com.example.Qlyhocsinh.enums.Role;
+import com.example.Qlyhocsinh.exception.AppException;
+import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.UserMapper;
 import com.example.Qlyhocsinh.repository.UserRepository;
 import lombok.AccessLevel;
@@ -35,6 +37,10 @@ public class UserService {
     PasswordEncoder passwordEncoder;
 
     public UserResponse createUser(UserCreationRequest request){
+        if(userRepository.findByUsername(request.getUsername()).isPresent()){
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        }
+
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -69,7 +75,7 @@ public class UserService {
     @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse updateUser(String id, UserUpdateRequest request){
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         userMapper.updateUser(user, request);
 
         return userMapper.toUserResponse(userRepository.save(user));
@@ -85,7 +91,7 @@ public class UserService {
     public UserResponse getUser(String id){
         log.info("O trong method getUser by ID");
         return userMapper.toUserResponse(userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 
 
@@ -94,7 +100,7 @@ public class UserService {
         String name = context.getAuthentication().getName();
 
          User user = userRepository.findByUsername(name)
-                .orElseThrow(() -> new RuntimeException("User khong ton tai"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
          return userMapper.toUserResponse(user);
     }

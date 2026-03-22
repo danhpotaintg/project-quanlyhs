@@ -5,6 +5,7 @@ import com.example.Qlyhocsinh.dto.request.UserCreationRequest;
 import com.example.Qlyhocsinh.dto.request.UserUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.UserResponse;
 import com.example.Qlyhocsinh.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    ApiResponse<UserResponse> createUser(@RequestBody UserCreationRequest request) {
+    ApiResponse<UserResponse> createUser(@Valid @RequestBody UserCreationRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.createUser(request))
                 .build();
@@ -65,7 +66,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    ApiResponse<UserResponse> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request) {
+    ApiResponse<UserResponse> updateUser(@PathVariable String id,@Valid @RequestBody UserUpdateRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.updateUser(id, request))
                 .build();

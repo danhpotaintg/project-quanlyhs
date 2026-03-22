@@ -3,11 +3,14 @@ package com.example.Qlyhocsinh.service;
 import com.example.Qlyhocsinh.dto.request.AuthenticationRequest;
 import com.example.Qlyhocsinh.dto.request.IntrospectRequest;
 import com.example.Qlyhocsinh.dto.request.LogoutRequest;
+import com.example.Qlyhocsinh.dto.request.RefreshRequest;
 import com.example.Qlyhocsinh.dto.response.AuthenticationResponse;
 import com.example.Qlyhocsinh.dto.response.IntrospectResponse;
 import com.example.Qlyhocsinh.entity.InvalidatedToken;
 import com.example.Qlyhocsinh.entity.User;
-import com.example.Qlyhocsinh.repository.InvalidateRepository;
+import com.example.Qlyhocsinh.exception.AppException;
+import com.example.Qlyhocsinh.exception.ErrorCode;
+import com.example.Qlyhocsinh.repository.InvalidatedTokenRepository;
 import com.example.Qlyhocsinh.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -40,7 +43,7 @@ import java.util.UUID;
 
 public class AuthenticationService {
     UserRepository userRepository;
-    InvalidateRepository invalidateRepository;
+    InvalidatedTokenRepository invalidatedTokenRepository;
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
@@ -105,6 +108,33 @@ public class AuthenticationService {
         }
     }
 
+    public AuthenticationResponse refreshToken(RefreshRequest request)
+            throws ParseException, JOSEException {
+        var signedJWT = verifyToken(request.getToken());
+
+        var jit = signedJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jit)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        var username = signedJWT.getJWTClaimsSet().getSubject();
+
+        var user = userRepository.findByUsername(username).orElseThrow(
+                () -> new AppException(ErrorCode.UNAUTHENTICATED)
+        );
+
+        var token = generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
+    }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
         var signToken = verifyToken(request.getToken());
@@ -117,7 +147,7 @@ public class AuthenticationService {
                 .expiryTime(expiryTime)
                 .build();
 
-        invalidateRepository.save(invalidatedToken);
+        invalidatedTokenRepository.save(invalidatedToken);
     }
 
     private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
@@ -132,7 +162,7 @@ public class AuthenticationService {
         if (!(verified && expiryTime.after(new Date())))
             throw new RuntimeException("Token het han");
 
-        if (invalidateRepository
+        if (invalidatedTokenRepository
                 .existsById(signedJWT.getJWTClaimsSet().getJWTID()))
             throw new RuntimeException("Khong tim thay token");
 

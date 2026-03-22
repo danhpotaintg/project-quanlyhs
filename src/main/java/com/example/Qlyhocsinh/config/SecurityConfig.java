@@ -30,7 +30,8 @@ public class SecurityConfig {
         "/users",
         "/auth/log-in",
         "/auth/introspect",
-        "/auth/logout"
+        "/auth/logout",
+         "/auth/refresh"
     };
 
     @Value("${jwt.signerKey}")
@@ -47,6 +48,7 @@ public class SecurityConfig {
 
         http.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
         );
 
         http.csrf(AbstractHttpConfigurer::disable);
