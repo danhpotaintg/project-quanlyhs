@@ -1,5 +1,6 @@
 package com.example.Qlyhocsinh.controller;
 
+import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.ClassRequest;
 import com.example.Qlyhocsinh.dto.response.ClassResponse;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
@@ -17,59 +18,79 @@ public class ClassController {
     private final ClassService classService;
 
     @PostMapping
-    ClassResponse createClass(@RequestBody ClassRequest request){
-        return classService.creatClass(request);
+    ApiResponse<ClassResponse> createClass(@RequestBody ClassRequest request){
+
+        return ApiResponse.<ClassResponse>builder()
+                .result(classService.createClass(request))
+                .build();
     }
 
     @PutMapping("/{id}")
-    ClassResponse updateClass(@PathVariable Long id,@RequestBody ClassRequest request){
-        return classService.updateClass(id, request);
+    ApiResponse<ClassResponse> updateClass(@PathVariable Long id, @RequestBody ClassRequest request) {
+        return ApiResponse.<ClassResponse>builder()
+                .result(classService.updateClass(id, request))
+                .build();
     }
 
     @GetMapping
-    List<ClassResponse> getAll(){
-        return classService.getAllClass();
+    ApiResponse<List<ClassResponse>> getAll() {
+        return ApiResponse.<List<ClassResponse>>builder()
+                .result(classService.getAllClass())
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    String deleteClass(@PathVariable Long id){
+    ApiResponse<String> deleteClass(@PathVariable Long id) {
         classService.deletedClass(id);
-        return "Class has been deleted !";
+        return ApiResponse.<String>builder()
+                .result("Class has been deleted !")
+                .build();
     }
 
     @PostMapping("/{clsId}/addstudent/{stuId}")
-    StudentResponse addStuToClass(@PathVariable Long clsId,@PathVariable String stuId){
-        return classService.addStudentToClass(stuId, clsId);
+    ApiResponse<StudentResponse> addStuToClass(@PathVariable Long clsId, @PathVariable String stuId) {
+        return ApiResponse.<StudentResponse>builder()
+                .result(classService.addStudentToClass(stuId, clsId))
+                .build();
     }
 
     @GetMapping("{clsId}/students")
-    List<StudentResponse> getStuInClass(@PathVariable Long clsId){
-        return classService.getStuInClass(clsId);
+    ApiResponse<List<StudentResponse>> getStuInClass(@PathVariable Long clsId) {
+        return ApiResponse.<List<StudentResponse>>builder()
+                .result(classService.getStuInClass(clsId))
+                .build();
     }
 
     @DeleteMapping("/{clsId}/removestudent/{stuId}")
-    String removeStudentInClass(@PathVariable String stuId,@PathVariable Long clsId){
+    ApiResponse<String> removeStudentInClass(@PathVariable String stuId, @PathVariable Long clsId) {
         classService.removeStudentFromClass(stuId, clsId);
-        return "Student has been deleted from class";
+        return ApiResponse.<String>builder()
+                .result("Student has been deleted from class")
+                .build();
     }
 
     @PostMapping("/{clsId}/tranferstudent/{stuId}")
-    String transferStudent(@PathVariable String stuId,@PathVariable Long clsId){
+    ApiResponse<String> transferStudent(@PathVariable String stuId, @PathVariable Long clsId) {
         classService.transferStudent(stuId, clsId);
-        return "Students successfully transferred classes";
+        return ApiResponse.<String>builder()
+                .result("Students successfully transferred classes")
+                .build();
     }
 
     @PostMapping("/{classId}/assign-teacher/{teacherId}")
-    public String assignTeacher(@PathVariable Long classId, @PathVariable String teacherId){
+    ApiResponse<String> assignTeacher(@PathVariable Long classId, @PathVariable String teacherId) {
         classService.addClassToTeacher(teacherId, classId);
-        return "Teacher added in to class successfully";
+        return ApiResponse.<String>builder()
+                .result("Teacher added in to class successfully")
+                .build();
     }
 
     @PostMapping("/{classId}/remove-teacher/{teacherId}")
-    public String removeTeacher(@PathVariable Long classId, @PathVariable String teacherId){
+    ApiResponse<String> removeTeacher(@PathVariable Long classId, @PathVariable String teacherId) {
         classService.removeTeacherFormClass(teacherId, classId);
-        return "Remove teacher from class success";
+        return ApiResponse.<String>builder()
+                .result("Remove teacher from class success")
+                .build();
     }
-
 }
 

@@ -6,6 +6,8 @@ import com.example.Qlyhocsinh.dto.response.StudentResponse;
 import com.example.Qlyhocsinh.entity.ClassRoom;
 import com.example.Qlyhocsinh.entity.Student;
 import com.example.Qlyhocsinh.entity.Teacher;
+import com.example.Qlyhocsinh.exception.AppException;
+import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.ClassMapper;
 import com.example.Qlyhocsinh.mapper.StudentMapper;
 import com.example.Qlyhocsinh.repository.ClassRepository;
@@ -29,7 +31,11 @@ public class ClassService {
     private final StudentMapper studentMapper;
     private final TeacherRepository teacherRepository;
 
-    public ClassResponse creatClass(ClassRequest request){
+    public ClassResponse createClass(ClassRequest request){
+        if(classRepository.findByClassName(request.getClassName()).isPresent()){
+            log.info(request.getClassName());
+            throw new AppException(ErrorCode.ClASS_EXISTED);
+        }
         ClassRoom classRoom = classMapper.toClassRoom(request);
         return classMapper.toClassResponse(classRepository.save(classRoom));
     }

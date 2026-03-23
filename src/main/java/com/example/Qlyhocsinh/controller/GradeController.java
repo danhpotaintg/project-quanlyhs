@@ -1,5 +1,6 @@
 package com.example.Qlyhocsinh.controller;
 
+import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.GradeRequest;
 import com.example.Qlyhocsinh.dto.response.GradeResponse;
 import com.example.Qlyhocsinh.service.GradeService;
@@ -16,24 +17,32 @@ public class GradeController {
     private final GradeService gradeService;
 
     @PostMapping
-    GradeResponse createGrade(@RequestBody GradeRequest request){
-        return gradeService.createGrade(request);
+    ApiResponse<GradeResponse> createGrade(@RequestBody GradeRequest request) {
+        return ApiResponse.<GradeResponse>builder()
+                .result(gradeService.createGrade(request))
+                .build();
     }
 
     @PutMapping("/{id}")
-    GradeResponse updateGrade(@PathVariable String id, @RequestBody GradeRequest request){
-        return gradeService.updateGrade(id, request);
+    ApiResponse<GradeResponse> updateGrade(@PathVariable String id, @RequestBody GradeRequest request) {
+        return ApiResponse.<GradeResponse>builder()
+                .result(gradeService.updateGrade(id, request))
+                .build();
     }
 
     @GetMapping
-    List<GradeResponse> getAll(){
-        return gradeService.getAll();
+    ApiResponse<List<GradeResponse>> getAll() {
+        return ApiResponse.<List<GradeResponse>>builder()
+                .result(gradeService.getAll())
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    String deleteGrade(@PathVariable String id){
+    ApiResponse<String> deleteGrade(@PathVariable String id) {
         gradeService.deleteGrade(id);
-        return "Delete grade success";
+        return ApiResponse.<String>builder()
+                .result("Delete grade success")
+                .build();
     }
 
 }

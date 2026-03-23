@@ -15,7 +15,7 @@ public class TeacherResponse {
     String id;
     String fullName;;
     LocalDate dob;
-
+    String gender;
     UserResponse user;
 
     String className;

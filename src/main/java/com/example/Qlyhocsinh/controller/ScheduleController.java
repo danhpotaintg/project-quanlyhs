@@ -1,8 +1,8 @@
 package com.example.Qlyhocsinh.controller;
 
+import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.ScheduleRequest;
 import com.example.Qlyhocsinh.dto.response.ScheduleResponse;
-import com.example.Qlyhocsinh.entity.Schedule;
 import com.example.Qlyhocsinh.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,26 +17,32 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping
-    ScheduleResponse createSche(@RequestBody ScheduleRequest request){
-        return scheduleService.createSchedule(request);
+    ApiResponse<ScheduleResponse> createSche(@RequestBody ScheduleRequest request) {
+        return ApiResponse.<ScheduleResponse>builder()
+                .result(scheduleService.createSchedule(request))
+                .build();
     }
 
     @PutMapping("/{id}")
-    ScheduleResponse updateShe(@PathVariable String id, @RequestBody ScheduleRequest request){
-        return scheduleService.updateSchedule(id, request);
+    ApiResponse<ScheduleResponse> updateShe(@PathVariable String id, @RequestBody ScheduleRequest request) {
+        return ApiResponse.<ScheduleResponse>builder()
+                .result(scheduleService.updateSchedule(id, request))
+                .build();
     }
 
     @GetMapping
-    List<ScheduleResponse> getAll(){
-        return scheduleService.getAll();
+    ApiResponse<List<ScheduleResponse>> getAll() {
+        return ApiResponse.<List<ScheduleResponse>>builder()
+                .result(scheduleService.getAll())
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    String deledeSche(@PathVariable String id){
+    ApiResponse<String> deledeSche(@PathVariable String id) {
         scheduleService.deleteSchedule(id);
-        return "Schedule has been deleted";
+        return ApiResponse.<String>builder()
+                .result("Schedule has been deleted")
+                .build();
     }
-
-
 
 }

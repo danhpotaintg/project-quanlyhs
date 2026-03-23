@@ -1,5 +1,6 @@
 package com.example.Qlyhocsinh.controller;
 
+import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.StudentCreationRequest;
 import com.example.Qlyhocsinh.dto.request.StudentUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
@@ -17,29 +18,39 @@ public class StudentController {
     private final StudentService studentService;
 
     @PostMapping
-    StudentResponse createStudent(@RequestBody StudentCreationRequest request){
-        return studentService.creatStudent(request);
+    ApiResponse<StudentResponse> createStudent(@RequestBody StudentCreationRequest request) {
+        return ApiResponse.<StudentResponse>builder()
+                .result(studentService.creatStudent(request))
+                .build();
     }
 
     @PutMapping("/{id}")
-    StudentResponse updateStudent(@PathVariable String id, @RequestBody StudentUpdateRequest request){
-        return studentService.updateStudent(id,request);
+    ApiResponse<StudentResponse> updateStudent(@PathVariable String id, @RequestBody StudentUpdateRequest request) {
+        return ApiResponse.<StudentResponse>builder()
+                .result(studentService.updateStudent(id, request))
+                .build();
     }
 
     @GetMapping
-    List<StudentResponse> getAll(){
-        return studentService.getAllStudents();
+    ApiResponse<List<StudentResponse>> getAll() {
+        return ApiResponse.<List<StudentResponse>>builder()
+                .result(studentService.getAllStudents())
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    String deleteStudent(@PathVariable String id){
+    ApiResponse<String> deleteStudent(@PathVariable String id) {
         studentService.deleteStudent(id);
-        return "Student has been deleted !";
+        return ApiResponse.<String>builder()
+                .result("Student has been deleted !")
+                .build();
     }
 
-    @GetMapping("/{id}")
-    StudentResponse getStudent(@PathVariable String id){
-        return studentService.getStudent(id);
+    @GetMapping("/my-info")
+    ApiResponse<StudentResponse> getStudent() {
+        return ApiResponse.<StudentResponse>builder()
+                .result(studentService.getStudent())
+                .build();
     }
 
 }

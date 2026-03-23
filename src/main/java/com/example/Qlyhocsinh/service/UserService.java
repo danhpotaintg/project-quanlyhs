@@ -57,11 +57,16 @@ public class UserService {
     }
 
 
-    @PostAuthorize("returnObject.username == authentication.name")
-    public UserResponse updateUser(String id, UserUpdateRequest request){
-        User user = userRepository.findById(id)
+
+    public UserResponse updateUser(UserUpdateRequest request){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        User user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
         userMapper.updateUser(user, request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

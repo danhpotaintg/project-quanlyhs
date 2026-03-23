@@ -1,5 +1,6 @@
 package com.example.Qlyhocsinh.controller;
 
+import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.AttendanceRequest;
 import com.example.Qlyhocsinh.dto.response.AttendanceResponse;
 import com.example.Qlyhocsinh.service.AttendanceService;
@@ -16,24 +17,32 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
 
     @PostMapping
-    AttendanceResponse creatAttendance(@RequestBody AttendanceRequest request){
-        return attendanceService.createAttendance(request);
+    ApiResponse<AttendanceResponse> creatAttendance(@RequestBody AttendanceRequest request){
+        return ApiResponse.<AttendanceResponse>builder()
+                .result(attendanceService.createAttendance(request))
+                .build();
     }
 
     @PutMapping("/{id}")
-    AttendanceResponse updateAttendance(@PathVariable Long id, @RequestBody AttendanceRequest request){
-        return attendanceService.updateAttendance(id, request);
+    ApiResponse<AttendanceResponse> updateAttendance(@PathVariable Long id, @RequestBody AttendanceRequest request){
+        return ApiResponse.<AttendanceResponse>builder()
+                .result(attendanceService.updateAttendance(id, request))
+                .build();
     }
 
     @GetMapping
-    List<AttendanceResponse> getAll(){
-        return attendanceService.getAll();
+    ApiResponse<List<AttendanceResponse>> getAll(){
+
+        return ApiResponse.<List<AttendanceResponse>>builder()
+                .result(attendanceService.getAll())
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    String deleteAttendance(@PathVariable Long id){
+    ApiResponse<String> deleteAttendance(@PathVariable Long id){
         attendanceService.deleteAttendance(id);
-        return "Delete success";
+        return ApiResponse.<String>builder()
+                .result("Delete success")
+                .build();
     }
-
 }

@@ -5,12 +5,15 @@ import com.example.Qlyhocsinh.dto.request.StudentUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
 import com.example.Qlyhocsinh.entity.Student;
 import com.example.Qlyhocsinh.entity.User;
+import com.example.Qlyhocsinh.exception.AppException;
+import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.StudentMapper;
 import com.example.Qlyhocsinh.mapper.UserMapper;
 import com.example.Qlyhocsinh.repository.StudentRepository;
 import com.example.Qlyhocsinh.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +31,9 @@ public class StudentService {
     private final PasswordEncoder passwordEncoder;
 
     public StudentResponse creatStudent(StudentCreationRequest request){
-
+        if(userRepository.findByUsername(request.getUsername()).isPresent()){
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        }
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole("STUDENT");
@@ -57,8 +62,11 @@ public class StudentService {
         return studentMapper.toStudentResponseList(studentRepository.findAll());
     }
 
-    public StudentResponse getStudent(String id){
-        Student student = studentRepository.findById(id)
+    public StudentResponse getStudent(){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        Student student = studentRepository.findByUserUsername(name)
                 .orElseThrow(()->new RuntimeException("Student not found"));
         return studentMapper.toStudentResponse(student);
     }

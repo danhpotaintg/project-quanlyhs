@@ -1,5 +1,6 @@
 package com.example.Qlyhocsinh.controller;
 
+import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.TeacherCreationRequest;
 import com.example.Qlyhocsinh.dto.request.TeacherUpdateResquest;
 import com.example.Qlyhocsinh.dto.response.TeacherResponse;
@@ -9,40 +10,47 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/teachers")
-
 public class TeacherController {
 
     private final TeacherService teacherService;
 
     @PostMapping
-    TeacherResponse createTeacher(@RequestBody TeacherCreationRequest request){
-        return teacherService.createTeacher(request);
+    ApiResponse<TeacherResponse> createTeacher(@RequestBody TeacherCreationRequest request) {
+        return ApiResponse.<TeacherResponse>builder()
+                .result(teacherService.createTeacher(request))
+                .build();
     }
 
     @PutMapping("/{id}")
-    TeacherResponse updateTeacher(@PathVariable String id, TeacherUpdateResquest request){
-        return teacherService.updateTeacher(id, request);
+    ApiResponse<TeacherResponse> updateTeacher(@PathVariable String id, @RequestBody TeacherUpdateResquest request) {
+        return ApiResponse.<TeacherResponse>builder()
+                .result(teacherService.updateTeacher(id, request))
+                .build();
     }
 
     @GetMapping
-    List<TeacherResponse> getAll(){
-        return teacherService.getAll();
+    ApiResponse<List<TeacherResponse>> getAll() {
+        return ApiResponse.<List<TeacherResponse>>builder()
+                .result(teacherService.getAll())
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    String deleteTeacher(@PathVariable String id){
+    ApiResponse<String> deleteTeacher(@PathVariable String id) {
         teacherService.deleteTea(id);
-        return "Teacher has been deleted !";
+        return ApiResponse.<String>builder()
+                .result("Teacher has been deleted !")
+                .build();
     }
 
-    @GetMapping("/{id}")
-    TeacherResponse getTeacher(@PathVariable String id){
-        return teacherService.getTea(id);
+    @GetMapping("/my-info")
+    ApiResponse<TeacherResponse> getTeacher() {
+        return ApiResponse.<TeacherResponse>builder()
+                .result(teacherService.getTea())
+                .build();
     }
-
 
 }
