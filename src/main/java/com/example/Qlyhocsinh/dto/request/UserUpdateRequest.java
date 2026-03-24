@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class UserUpdateRequest {
+
+    private String oldPassword;
     @Size(min = 8, message = "INVALID_PASSWORD")
     private String password;
 }

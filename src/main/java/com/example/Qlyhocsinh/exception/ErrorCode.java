@@ -17,6 +17,7 @@ public enum ErrorCode {
     UNAUTHORIZED(1007, "Ban khong co quyen truy cap", HttpStatus.FORBIDDEN),
     WRONG_ACCOUNT(1008, "Sai tai khoan hoac mat khau", HttpStatus.BAD_REQUEST),
     ClASS_EXISTED(1009, "Lop hoc da ton tai", HttpStatus.BAD_REQUEST),
+    PASSWORD_INCORRECT(1009, "Mật khẩu hiện tại không chính xác", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(
