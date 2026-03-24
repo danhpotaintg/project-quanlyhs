@@ -16,6 +16,7 @@ import com.example.Qlyhocsinh.repository.TeacherRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class ClassService {
     private final StudentMapper studentMapper;
     private final TeacherRepository teacherRepository;
 
+    @PreAuthorize("hasRole('ADMIN')")
     public ClassResponse createClass(ClassRequest request){
         if(classRepository.findByClassName(request.getClassName()).isPresent()){
             log.info(request.getClassName());

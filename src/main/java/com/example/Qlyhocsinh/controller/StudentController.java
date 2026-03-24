@@ -20,7 +20,7 @@ public class StudentController {
     @PostMapping
     ApiResponse<StudentResponse> createStudent(@RequestBody StudentCreationRequest request) {
         return ApiResponse.<StudentResponse>builder()
-                .result(studentService.creatStudent(request))
+                .result(studentService.createStudent(request))
                 .build();
     }
 

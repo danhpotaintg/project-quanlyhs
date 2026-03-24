@@ -17,6 +17,7 @@ import com.example.Qlyhocsinh.repository.TeacherRepository;
 import com.example.Qlyhocsinh.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class TeacherService {
 
     private final PasswordEncoder passwordEncoder;
 
+    @PreAuthorize("hasRole('ADMIN')")
     public TeacherResponse createTeacher(TeacherCreationRequest request){
         if(userRepository.findByUsername(request.getUsername()).isPresent()){
             throw new AppException(ErrorCode.USERNAME_EXISTED);

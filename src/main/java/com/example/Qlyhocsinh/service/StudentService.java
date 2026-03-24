@@ -13,6 +13,7 @@ import com.example.Qlyhocsinh.repository.StudentRepository;
 import com.example.Qlyhocsinh.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,8 @@ public class StudentService {
     private final StudentMapper studentMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public StudentResponse creatStudent(StudentCreationRequest request){
+    @PreAuthorize("hasRole('ADMIN')")
+    public StudentResponse createStudent(StudentCreationRequest request){
         if(userRepository.findByUsername(request.getUsername()).isPresent()){
             throw new AppException(ErrorCode.USERNAME_EXISTED);
         }
