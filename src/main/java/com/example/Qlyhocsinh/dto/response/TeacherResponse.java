@@ -20,4 +20,6 @@ public class TeacherResponse {
 
     String className;
 
+    private String avatarUrl;
+
 }

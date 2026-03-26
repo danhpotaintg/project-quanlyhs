@@ -3,6 +3,7 @@ package com.example.Qlyhocsinh.config;
 import com.example.Qlyhocsinh.dto.request.IntrospectRequest;
 import com.example.Qlyhocsinh.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -16,13 +17,13 @@ import javax.crypto.spec.SecretKeySpec;
 import java.text.ParseException;
 import java.util.Objects;
 
+@RequiredArgsConstructor
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
     @Value("${jwt.signerKey}")
     private String signerKey;
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
     private NimbusJwtDecoder nimbusJwtDecoder = null;
 
