@@ -2,6 +2,7 @@ package com.example.Qlyhocsinh.controller;
 
 import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.UserCreationRequest;
+import com.example.Qlyhocsinh.dto.request.UserUpdateByIDRequest;
 import com.example.Qlyhocsinh.dto.request.UserUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.UserResponse;
 import com.example.Qlyhocsinh.service.UserService;
@@ -69,6 +70,13 @@ public class UserController {
     ApiResponse<UserResponse> updateUser(@Valid @RequestBody UserUpdateRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.updateUser(request))
+                .build();
+    }
+
+    @PutMapping("/{userId}")
+    ApiResponse<UserResponse> updateUserByID(@PathVariable("userId") String userId, @Valid @RequestBody UserUpdateByIDRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateUserByID(userId, request))
                 .build();
     }
 }

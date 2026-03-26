@@ -1,6 +1,7 @@
 package com.example.Qlyhocsinh.service;
 
 import com.example.Qlyhocsinh.dto.request.UserCreationRequest;
+import com.example.Qlyhocsinh.dto.request.UserUpdateByIDRequest;
 import com.example.Qlyhocsinh.dto.request.UserUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.UserResponse;
 import com.example.Qlyhocsinh.entity.User;
@@ -56,6 +57,16 @@ public class UserService {
                 .map(userMapper::toUserResponse).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserResponse updateUserByID(String userId, UserUpdateByIDRequest request){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        userMapper.updateUserByID(user, request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 
 
     public UserResponse updateUser(UserUpdateRequest request) {

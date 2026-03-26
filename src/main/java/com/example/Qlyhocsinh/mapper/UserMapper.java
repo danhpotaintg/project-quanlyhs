@@ -1,9 +1,6 @@
 package com.example.Qlyhocsinh.mapper;
 
-import com.example.Qlyhocsinh.dto.request.StudentCreationRequest;
-import com.example.Qlyhocsinh.dto.request.TeacherCreationRequest;
-import com.example.Qlyhocsinh.dto.request.UserCreationRequest;
-import com.example.Qlyhocsinh.dto.request.UserUpdateRequest;
+import com.example.Qlyhocsinh.dto.request.*;
 import com.example.Qlyhocsinh.dto.response.UserResponse;
 import com.example.Qlyhocsinh.entity.User;
 import org.mapstruct.Mapper;
@@ -20,4 +17,5 @@ public interface UserMapper {
 
     @Mapping(target = "password", ignore = true)
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
+    void updateUserByID(@MappingTarget User user, UserUpdateByIDRequest request);
 }
