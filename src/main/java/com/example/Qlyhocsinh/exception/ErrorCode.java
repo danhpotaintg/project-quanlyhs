@@ -20,8 +20,7 @@ public enum ErrorCode {
     PASSWORD_INCORRECT(1009, "Mật khẩu hiện tại không chính xác", HttpStatus.BAD_REQUEST),
     ;
 
-    ErrorCode(
-            int code, String message, HttpStatusCode statusCode) {
+    ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
         this.message = message;
         this.statusCode = statusCode;
