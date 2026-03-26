@@ -7,8 +7,10 @@ import com.example.Qlyhocsinh.dto.response.TeacherResponse;
 import com.example.Qlyhocsinh.service.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -50,6 +52,14 @@ public class TeacherController {
     ApiResponse<TeacherResponse> getTeacher() {
         return ApiResponse.<TeacherResponse>builder()
                 .result(teacherService.getTea())
+                .build();
+    }
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping("upload-avatar")
+    ApiResponse<TeacherResponse> updateAvatar(@RequestParam("file") MultipartFile file){
+        return ApiResponse.<TeacherResponse>builder()
+                .result(teacherService.updateAvatar(file))
                 .build();
     }
 
