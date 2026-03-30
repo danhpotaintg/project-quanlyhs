@@ -17,6 +17,7 @@ import java.time.LocalTime;
 public class Schedule {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "schedule_id", nullable = false)
     String id;
 

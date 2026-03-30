@@ -13,9 +13,9 @@ import java.util.List;
 public class ClassRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "class_id")
-    private String id;
+    private Long id;
 
     private String className;
     private String academicYear;

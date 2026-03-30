@@ -26,7 +26,6 @@ public class Grade {
     LocalDate gradedAt;
     String note;
 
-    @Column(precision = 4, scale = 2)
     double score;
 
     @Enumerated(EnumType.STRING)

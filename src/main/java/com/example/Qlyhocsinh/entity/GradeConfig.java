@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "gradeconfig")
+@Table(name = "grade_config")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GradeConfig {
     @Id

@@ -21,13 +21,11 @@ public class TeacherAssignment {
     private String id;
 
     @ManyToOne
-    @MapsId("teacherId")
-    @JoinColumn(name = "teacher_id")
+    @JoinColumn(name = "teacher_id", nullable = false)
     Teacher teacher;
 
     @ManyToOne
-    @MapsId("subjectId")
-    @JoinColumn(name = "subject_id")
+    @JoinColumn(name = "subject_id", nullable = false)
     Subject subject;
 
     boolean isPrimary;

@@ -38,7 +38,7 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse<String> deleteSub(@PathVariable String id) {
+    ApiResponse<String> deleteSub(@PathVariable String id){
         subjectService.deleteSub(id);
         return ApiResponse.<String>builder()
                 .result("Subject has been deleted")
