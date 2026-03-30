@@ -23,6 +23,9 @@ public class Schedule {
     LocalTime startTime;
     LocalTime endTime;
 
+    int semester;
+    int academic_year;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     DayOfWeek dayOfWeek;

@@ -13,23 +13,16 @@ import java.util.List;
 public class ClassRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "class_id")
-    private Long id;
+    private String id;
 
     private String className;
     private String academicYear;
 
-    @OneToOne
-    @JoinColumn(name = "teacher_id", unique = true)
+    @ManyToOne
+    @JoinColumn(name = "homeroom_teacher_id")
     private Teacher teacher;
 
-    @ManyToMany
-    @JoinTable(
-            name = "class_subject",
-            joinColumns = @JoinColumn(name = "class_id"),
-            inverseJoinColumns = @JoinColumn(name = "subject_id")
-    )
-    private List<Subject> subjects;
 
 }

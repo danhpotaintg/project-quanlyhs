@@ -1,5 +1,6 @@
 package com.example.Qlyhocsinh.entity;
 
+import com.example.Qlyhocsinh.enums.AttendanceStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -21,14 +22,20 @@ public class Attendance {
     Long id;
 
     LocalTime checkInTime;
-    String status;
+    String note;
+
+    @Enumerated(EnumType.STRING)
+    AttendanceStatus status;
 
     @ManyToOne
     @JoinColumn(name = "student_id")
     Student student;
 
     @ManyToOne
-    @JoinColumn(name ="schedule_id")
+    @JoinColumn(name = "schedule_id")
     Schedule schedule;
 
+    @ManyToOne
+    @JoinColumn(name = "teacher_id")
+    Teacher teacher;
 }

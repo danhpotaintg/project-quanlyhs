@@ -3,16 +3,14 @@ package com.example.Qlyhocsinh.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class GradeRequest {
-
-
-    private String scoreType;
-    private float score;
-
+public class TeacherAssignment {
+    String teacherId;
+    String subjectId;
+    boolean isPrimary;
+    int assignedYear;
 }

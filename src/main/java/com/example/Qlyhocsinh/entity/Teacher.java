@@ -30,15 +30,9 @@ public class Teacher {
     private LocalDate dob;
     private String gender;
 
-    @OneToOne(mappedBy = "teacher")
-    private ClassRoom classRoom;
 
-    @ManyToMany
-    @JoinTable(
-            name = "teacher_subject",
-            joinColumns = @JoinColumn(name = "teacher_id"),
-            inverseJoinColumns = @JoinColumn(name = "subject_id")
-    )
-    private List<Subject> subjects;
+
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeacherAssignment> assignments;
 
 }

@@ -29,6 +29,7 @@ public class Student {
     String parentGmail;
     String parentPhonenumber;
     String gender;
+    int academicYear;
 
     @ManyToOne
     @JoinColumn(name = "class_id")
