@@ -18,6 +18,9 @@ public enum ErrorCode {
     WRONG_ACCOUNT(1008, "Sai tai khoan hoac mat khau", HttpStatus.BAD_REQUEST),
     ClASS_EXISTED(1009, "Lop hoc da ton tai", HttpStatus.BAD_REQUEST),
     PASSWORD_INCORRECT(1009, "Mật khẩu hiện tại không chính xác", HttpStatus.BAD_REQUEST),
+    CLASS_NOT_FOUND(1010, "Lớp học không tồn tại", HttpStatus.NOT_FOUND),
+    STUDENT_NOT_FOUND(1011, "Học sinh không tồn tại", HttpStatus.NOT_FOUND),
+    TEACHER_NOT_FOUND(1012, "Giáo viên không tồn tại", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

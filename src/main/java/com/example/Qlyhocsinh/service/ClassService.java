@@ -1,6 +1,8 @@
 package com.example.Qlyhocsinh.service;
 
+import com.example.Qlyhocsinh.dto.request.AssignStudentClassRequest;
 import com.example.Qlyhocsinh.dto.request.ClassRequest;
+import com.example.Qlyhocsinh.dto.response.AssignStudentClassResponse;
 import com.example.Qlyhocsinh.dto.response.ClassResponse;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
 import com.example.Qlyhocsinh.entity.ClassRoom;
@@ -8,6 +10,7 @@ import com.example.Qlyhocsinh.entity.Student;
 import com.example.Qlyhocsinh.entity.Teacher;
 import com.example.Qlyhocsinh.exception.AppException;
 import com.example.Qlyhocsinh.exception.ErrorCode;
+import com.example.Qlyhocsinh.mapper.AssignMapper;
 import com.example.Qlyhocsinh.mapper.ClassMapper;
 import com.example.Qlyhocsinh.mapper.StudentMapper;
 import com.example.Qlyhocsinh.repository.ClassRepository;
@@ -31,6 +34,7 @@ public class ClassService {
     private final StudentRepository studentRepository;
     private final StudentMapper studentMapper;
     private final TeacherRepository teacherRepository;
+    private final AssignMapper assignMapper;
 
     @PreAuthorize("hasRole('ADMIN')")
     public ClassResponse createClass(ClassRequest request){
@@ -44,7 +48,7 @@ public class ClassService {
 
     public ClassResponse updateClass(Long id, ClassRequest request){
         ClassRoom classRoom = classRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Class Not Found"));
+                .orElseThrow(()-> new AppException(ErrorCode.CLASS_NOT_FOUND));
         classMapper.updateClass(classRoom, request);
         return classMapper.toClassResponse(classRepository.save(classRoom));
     }
@@ -57,7 +61,7 @@ public class ClassService {
     @Transactional
     public void deletedClass(Long id){
         ClassRoom classRoom = classRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Class Not Found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
 
         List<Student> students = studentRepository.findByClassRoomId(id);
         for( Student student : students){
@@ -69,9 +73,9 @@ public class ClassService {
 
     public StudentResponse addStudentToClass(String studentId, Long classId){
         ClassRoom classRoom = classRepository.findById(classId)
-                .orElseThrow(() -> new RuntimeException("Class not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(()-> new RuntimeException("Student not found"));
+                .orElseThrow(()-> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
         if (student.getClassRoom() != null) {
             throw new RuntimeException("Student already in a class");
@@ -79,6 +83,28 @@ public class ClassService {
 
         student.setClassRoom(classRoom);
         return studentMapper.toStudentResponse(studentRepository.save(student));
+    }
+
+    public AssignStudentClassResponse addStudentsToClass(Long classId, AssignStudentClassRequest request){
+        ClassRoom classRoom = classRepository.findById(classId)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
+
+        List<Student> studentValidIDs = studentRepository.findAllWithoutClass()
+                .stream()
+                .filter(s -> request.getStudentIds().contains(s.getUserId()))
+                .toList();
+
+
+        for(Student student : studentValidIDs){
+            student.setClassRoom(classRoom);
+            student.setAcademicYear(classRoom.getAcademicYear());
+        }
+
+        List<Student> saved = studentRepository.saveAll(studentValidIDs);
+        return assignMapper.toAssignStudentClassResponse(
+                classRoom, classRoom.getAcademicYear(), saved
+        );
+
     }
 
     public List<StudentResponse> getStuInClass(Long id){
@@ -96,10 +122,10 @@ public class ClassService {
     public void transferStudent(String studentId, Long newClassId) {
 
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
         ClassRoom newClass = classRepository.findById(newClassId)
-                .orElseThrow(() -> new RuntimeException("Class not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
 
         if(student.getClassRoom().getId().equals(newClassId)) throw new RuntimeException("Student already in to class");
 
@@ -111,9 +137,9 @@ public class ClassService {
 
     public void addClassToTeacher(String teacherId, Long classId){
         ClassRoom classRoom = classRepository.findById(classId)
-                .orElseThrow(() -> new RuntimeException("Class not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
         if(classRoom.getTeacher() != null){
             throw new RuntimeException("Class already a teacher");
@@ -129,7 +155,7 @@ public class ClassService {
 
     public void removeTeacherFormClass(String teacherId, Long classId){
         ClassRoom classRoom = classRepository.findById(classId)
-                .orElseThrow(() -> new RuntimeException("Class not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
         if(classRoom.getTeacher() == null){

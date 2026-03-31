@@ -11,6 +11,6 @@ import lombok.experimental.FieldDefaults;
 public class ClassRequest {
 
     String className;
-    String academicYear;
+    int academicYear;
 
 }

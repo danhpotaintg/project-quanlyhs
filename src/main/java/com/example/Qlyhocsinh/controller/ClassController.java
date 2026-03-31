@@ -1,7 +1,9 @@
 package com.example.Qlyhocsinh.controller;
 
 import com.example.Qlyhocsinh.dto.request.ApiResponse;
+import com.example.Qlyhocsinh.dto.request.AssignStudentClassRequest;
 import com.example.Qlyhocsinh.dto.request.ClassRequest;
+import com.example.Qlyhocsinh.dto.response.AssignStudentClassResponse;
 import com.example.Qlyhocsinh.dto.response.ClassResponse;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
 import com.example.Qlyhocsinh.service.ClassService;
@@ -51,6 +53,13 @@ public class ClassController {
     ApiResponse<StudentResponse> addStuToClass(@PathVariable Long clsId, @PathVariable String stuId) {
         return ApiResponse.<StudentResponse>builder()
                 .result(classService.addStudentToClass(stuId, clsId))
+                .build();
+    }
+
+    @PostMapping("/{classId}/addstudent")
+    ApiResponse<AssignStudentClassResponse> addStudentsToClass(@PathVariable Long classId ,@RequestBody AssignStudentClassRequest request){
+        return ApiResponse.<AssignStudentClassResponse>builder()
+                .result(classService.addStudentsToClass(classId, request))
                 .build();
     }
 

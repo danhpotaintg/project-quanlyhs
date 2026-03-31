@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 public class ClassResponse {
     Long id;
     String className;
-    String academicYear;
+    int academicYear;
 
     String teacherName;
 }
