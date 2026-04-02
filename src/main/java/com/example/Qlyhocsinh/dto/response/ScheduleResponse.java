@@ -13,6 +13,15 @@ import java.time.LocalTime;
 @FieldDefaults(level =  AccessLevel.PRIVATE)
 public class ScheduleResponse {
     String id;
+
+    Long classId;
+    String className;
+
+    String subjectId;
+    String subjectName;
+
+    String teacherId;
+    String teacherName;
     private LocalTime startTime;;
     private LocalTime endTime;
     private DayOfWeek dayOfWeek;

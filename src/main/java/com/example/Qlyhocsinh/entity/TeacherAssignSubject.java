@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
         uniqueConstraints = @UniqueConstraint(columnNames = {"teacher_id", "subject_id"})
 )
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TeacherAssignment {
+public class TeacherAssignSubject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,7 +28,6 @@ public class TeacherAssignment {
     @JoinColumn(name = "subject_id", nullable = false)
     Subject subject;
 
-    boolean isPrimary;
     int assignedYear;
 
 

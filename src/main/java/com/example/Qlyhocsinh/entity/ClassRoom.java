@@ -20,7 +20,7 @@ public class ClassRoom {
     private String className;
     private int academicYear;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "homeroom_teacher_id")
     private Teacher teacher;
 

@@ -30,9 +30,10 @@ public class Teacher {
     private LocalDate dob;
     private String gender;
 
-
+    @OneToOne(mappedBy = "teacher")
+    private ClassRoom classRoom;
 
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeacherAssignment> assignments;
+    private List<TeacherAssignSubject> assignSubjects;
 
 }

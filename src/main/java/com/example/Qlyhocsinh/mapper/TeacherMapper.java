@@ -13,7 +13,9 @@ public interface TeacherMapper {
     Teacher toTeacher(TeacherCreationRequest request);
 
     @Mapping(source = "user.id", target = "id")
+    @Mapping(source = "classRoom.className", target = "className")
     TeacherResponse toTeacherResponse(Teacher teacher);
+
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE) // not update null
     void toUpdateTeacher(@MappingTarget Teacher teacher, TeacherUpdateResquest request);

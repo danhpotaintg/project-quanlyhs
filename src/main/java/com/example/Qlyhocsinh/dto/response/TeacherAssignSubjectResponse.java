@@ -1,4 +1,4 @@
-package com.example.Qlyhocsinh.dto.request;
+package com.example.Qlyhocsinh.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,9 +8,15 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TeacherAssignmentRequest {
+public class TeacherAssignSubjectResponse {
+
     String teacherId;
+    String teacherName;
+
+
     String subjectId;
-    boolean isPrimary;
+    String subjectName;
+
+
     int assignedYear;
 }

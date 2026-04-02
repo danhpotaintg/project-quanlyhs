@@ -135,25 +135,27 @@ public class ClassService {
 
     }
 
-    public void addClassToTeacher(String teacherId, Long classId){
+    public ClassResponse addClassToTeacher(String teacherId, Long classId){
         ClassRoom classRoom = classRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
         if(classRoom.getTeacher() != null){
-            throw new RuntimeException("Class already a teacher");
+            throw new AppException(ErrorCode.CLASS_HAS_TEACHER);
         }
 
         boolean exists = classRepository.existsByTeacherUserId(teacherId);
         if(exists) throw new RuntimeException("Teacher already assigned to another class");
 
         classRoom.setTeacher(teacher);
-        classRepository.save(classRoom);
 
+        return classMapper.toClassResponse(classRepository.save(classRoom));
     }
 
-    public void removeTeacherFormClass(String teacherId, Long classId){
+
+
+    public void removeTeacherFromClass(String teacherId, Long classId){
         ClassRoom classRoom = classRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         Teacher teacher = teacherRepository.findById(teacherId)

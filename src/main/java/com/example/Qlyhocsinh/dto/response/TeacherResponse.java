@@ -1,7 +1,10 @@
 package com.example.Qlyhocsinh.dto.response;
 
+import com.example.Qlyhocsinh.entity.TeacherAssignSubject;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 import java.time.LocalDate;
 
@@ -20,6 +23,7 @@ public class TeacherResponse {
 
     String className;
 
+    List<TeacherAssignSubject> assignSubjects;
     private String avatarUrl;
 
 }

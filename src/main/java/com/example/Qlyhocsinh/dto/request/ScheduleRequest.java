@@ -12,8 +12,12 @@ import java.time.LocalTime;
 @Builder
 @FieldDefaults(level =  AccessLevel.PRIVATE)
 public class ScheduleRequest{
-    String id;
+    Long classId;
+    String subjectId;
+    String teacherId;
     private LocalTime startTime;;
     private LocalTime endTime;
     private DayOfWeek dayOfWeek;
+    int semester;
+    int academicYear;
 }

@@ -2,9 +2,17 @@ package com.example.Qlyhocsinh.service;
 
 import com.example.Qlyhocsinh.dto.request.ScheduleRequest;
 import com.example.Qlyhocsinh.dto.response.ScheduleResponse;
+import com.example.Qlyhocsinh.entity.ClassRoom;
 import com.example.Qlyhocsinh.entity.Schedule;
+import com.example.Qlyhocsinh.entity.Subject;
+import com.example.Qlyhocsinh.entity.Teacher;
+import com.example.Qlyhocsinh.exception.AppException;
+import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.ScheduleMapper;
+import com.example.Qlyhocsinh.repository.ClassRepository;
 import com.example.Qlyhocsinh.repository.ScheduleRepository;
+import com.example.Qlyhocsinh.repository.SubjectRepository;
+import com.example.Qlyhocsinh.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,8 +26,20 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final ScheduleMapper scheduleMapper;
+    private final TeacherRepository teacherRepository;
+    private final ClassRepository classRepository;
+    private final SubjectRepository subjectRepository;
 
     public ScheduleResponse createSchedule(ScheduleRequest request){
+        ClassRoom classRoom = classRepository.findById(request.getClassId())
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
+
+        Teacher teacher = teacherRepository.findById(request.getTeacherId())
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+
+        Subject subject = subjectRepository.findById(request.getSubjectId())
+                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+
         Schedule schedule = scheduleMapper.toSchedule(request);
         return scheduleMapper.toScheduleResponse(scheduleRepository.save(schedule));
     }

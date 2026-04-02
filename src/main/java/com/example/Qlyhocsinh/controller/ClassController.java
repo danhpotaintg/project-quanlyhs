@@ -87,16 +87,16 @@ public class ClassController {
     }
 
     @PostMapping("/{classId}/assign-teacher/{teacherId}")
-    ApiResponse<String> assignTeacher(@PathVariable Long classId, @PathVariable String teacherId) {
-        classService.addClassToTeacher(teacherId, classId);
-        return ApiResponse.<String>builder()
-                .result("Teacher added in to class successfully")
+    ApiResponse<ClassResponse> assignTeacher(@PathVariable Long classId, @PathVariable String teacherId) {
+
+        return ApiResponse.<ClassResponse>builder()
+                .result(classService.addClassToTeacher(teacherId, classId))
                 .build();
     }
 
     @PostMapping("/{classId}/remove-teacher/{teacherId}")
     ApiResponse<String> removeTeacher(@PathVariable Long classId, @PathVariable String teacherId) {
-        classService.removeTeacherFormClass(teacherId, classId);
+        classService.removeTeacherFromClass(teacherId, classId);
         return ApiResponse.<String>builder()
                 .result("Remove teacher from class success")
                 .build();
