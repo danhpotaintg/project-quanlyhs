@@ -23,7 +23,8 @@ public class TeacherResponse {
 
     String className;
 
-    List<TeacherAssignSubject> assignSubjects;
+    String subjectName;
+
     private String avatarUrl;
 
 }

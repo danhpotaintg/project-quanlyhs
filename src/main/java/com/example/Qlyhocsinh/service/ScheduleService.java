@@ -1,6 +1,7 @@
 package com.example.Qlyhocsinh.service;
 
 import com.example.Qlyhocsinh.dto.request.ScheduleRequest;
+import com.example.Qlyhocsinh.dto.response.ClassResponse;
 import com.example.Qlyhocsinh.dto.response.ScheduleResponse;
 import com.example.Qlyhocsinh.entity.ClassRoom;
 import com.example.Qlyhocsinh.entity.Schedule;
@@ -8,6 +9,7 @@ import com.example.Qlyhocsinh.entity.Subject;
 import com.example.Qlyhocsinh.entity.Teacher;
 import com.example.Qlyhocsinh.exception.AppException;
 import com.example.Qlyhocsinh.exception.ErrorCode;
+import com.example.Qlyhocsinh.mapper.ClassMapper;
 import com.example.Qlyhocsinh.mapper.ScheduleMapper;
 import com.example.Qlyhocsinh.repository.ClassRepository;
 import com.example.Qlyhocsinh.repository.ScheduleRepository;
@@ -15,6 +17,7 @@ import com.example.Qlyhocsinh.repository.SubjectRepository;
 import com.example.Qlyhocsinh.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +32,7 @@ public class ScheduleService {
     private final TeacherRepository teacherRepository;
     private final ClassRepository classRepository;
     private final SubjectRepository subjectRepository;
+    private final ClassMapper classMapper;
 
     public ScheduleResponse createSchedule(ScheduleRequest request){
         ClassRoom classRoom = classRepository.findById(request.getClassId())
@@ -41,6 +45,10 @@ public class ScheduleService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
 
         Schedule schedule = scheduleMapper.toSchedule(request);
+        schedule.setClassRoom(classRoom);
+        schedule.setTeacher(teacher);
+        schedule.setSubject(subject);
+
         return scheduleMapper.toScheduleResponse(scheduleRepository.save(schedule));
     }
 
@@ -62,6 +70,18 @@ public class ScheduleService {
                 .orElseThrow(() -> new RuntimeException("Schedule not found"));
 
         return scheduleMapper.toScheduleResponse(schedule);
+    }
+
+    public List<ClassResponse> getAllClassByTeacher(){
+        var context = SecurityContextHolder.getContext();
+        String teacherName = context.getAuthentication().getName();
+
+        Teacher teacher = teacherRepository.findByUserUsername(teacherName)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+
+        List<ClassRoom> classes = scheduleRepository.findDistinctClassByTeacherId(teacher.getUserId());
+
+        return classMapper.toClassResponseList(classes);
     }
 
     public void deleteSchedule(String id){

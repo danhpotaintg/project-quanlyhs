@@ -22,5 +22,6 @@ public class StudentCreationRequest {
     String parentGmail;
     String parentPhonenumber;
     String gender;
+    int academicYear;
 
 }

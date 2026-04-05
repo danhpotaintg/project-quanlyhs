@@ -25,4 +25,7 @@ public class ScheduleResponse {
     private LocalTime startTime;;
     private LocalTime endTime;
     private DayOfWeek dayOfWeek;
+
+    int semester;
+    int academicYear;
 }

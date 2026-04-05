@@ -20,6 +20,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -109,6 +110,20 @@ public class ClassService {
 
     public List<StudentResponse> getStuInClass(Long id){
         return studentMapper.toStudentResponseList(studentRepository.findByClassRoomId(id));
+    }
+
+    public List<StudentResponse> getMyStudents(){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        Teacher teacher = teacherRepository.findByUserUsername(name)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+
+        if (teacher.getClassRoom() == null) {
+            throw new AppException(ErrorCode.CLASS_NOT_FOUND);
+        }
+
+        return studentMapper.toStudentResponseList(studentRepository.findByClassRoomId(teacher.getClassRoom().getId()));
     }
 
     public void removeStudentFromClass(String studentId, Long classId){

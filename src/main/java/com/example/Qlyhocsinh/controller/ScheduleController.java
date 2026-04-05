@@ -2,6 +2,7 @@ package com.example.Qlyhocsinh.controller;
 
 import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.ScheduleRequest;
+import com.example.Qlyhocsinh.dto.response.ClassResponse;
 import com.example.Qlyhocsinh.dto.response.ScheduleResponse;
 import com.example.Qlyhocsinh.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,13 @@ public class ScheduleController {
         scheduleService.deleteSchedule(id);
         return ApiResponse.<String>builder()
                 .result("Schedule has been deleted")
+                .build();
+    }
+
+    @GetMapping("/teacher-classes")
+    ApiResponse<List<ClassResponse>> getAllClassByTeacherId(){
+        return ApiResponse.<List<ClassResponse>>builder()
+                .result(scheduleService.getAllClassByTeacher())
                 .build();
     }
 

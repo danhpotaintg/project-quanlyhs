@@ -70,6 +70,13 @@ public class ClassController {
                 .build();
     }
 
+    @GetMapping("/my-class-students")
+    ApiResponse<List<StudentResponse>> getMyStuInClass() {
+        return ApiResponse.<List<StudentResponse>>builder()
+                .result(classService.getMyStudents())
+                .build();
+    }
+
     @DeleteMapping("/{clsId}/removestudent/{stuId}")
     ApiResponse<String> removeStudentInClass(@PathVariable String stuId, @PathVariable Long clsId) {
         classService.removeStudentFromClass(stuId, clsId);

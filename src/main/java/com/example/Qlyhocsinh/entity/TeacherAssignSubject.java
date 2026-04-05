@@ -27,8 +27,7 @@ public class TeacherAssignSubject {
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     Subject subject;
-
-    int assignedYear;
+    
 
 
 }
