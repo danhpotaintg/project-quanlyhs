@@ -11,14 +11,12 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TeacherCreationRequest {
-    //user
-    private String username;
-    private String password;
 
-    //teacher
     private String fullName;
     private LocalDate dob;
     private String gender;
+    private String email;
+    private String phoneNumber;
 
     private String subjectName;
 

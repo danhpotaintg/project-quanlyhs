@@ -16,6 +16,8 @@ public class TeacherResponse {
     String fullName;;
     LocalDate dob;
     String gender;
+    String email;
+    String phoneNumber;
     UserResponse user;
 
     String className;
