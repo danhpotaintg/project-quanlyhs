@@ -5,6 +5,8 @@ import com.example.Qlyhocsinh.dto.request.StudentUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
 import com.example.Qlyhocsinh.entity.Student;
 import com.example.Qlyhocsinh.entity.User;
+import com.example.Qlyhocsinh.exception.AppException;
+import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.StudentMapper;
 import com.example.Qlyhocsinh.mapper.UserMapper;
 import com.example.Qlyhocsinh.repository.StudentRepository;
@@ -28,44 +30,22 @@ public class StudentService {
     private final UserMapper userMapper;
     private final StudentMapper studentMapper;
     private final PasswordEncoder passwordEncoder;
-    private final AccountService accountService;
-    private final IdGeneratorService idGeneratorService;
-
 
     @PreAuthorize("hasRole('ADMIN')")
-    public StudentResponse createStudent(StudentCreationRequest request) {
-        // 1. Sinh ID (K22ST00001)
-        String studentId = idGeneratorService.generateId("STUDENT", String.valueOf(request.getAcademicYear()), 0);
-
-        // 2. Sinh Username và Password
-        String username = accountService.generateUsername(request.getFullName(), studentId);
-        String password = accountService.generateDefaultPassword(studentId);
-
-        // 3. Tạo User
-//        User user = User.builder()
-//                .id(studentId) // Gán ID chuẩn
-//                .username(username) // anv_K22ST00001
-//                .password(passwordEncoder.encode(password)) // Mã hóa K22ST00001
-//                .role("STUDENT")
-//                .build();
+    public StudentResponse createStudent(StudentCreationRequest request){
+        if(userRepository.findByUsername(request.getUsername()).isPresent()){
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        }
         User user = userMapper.toUser(request);
-        user.setId(studentId);
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole("STUDENT");
+        userRepository.save(user);
 
         Student student = studentMapper.toStudent(request);
         student.setUser(user);
 
-        // 4. Tạo Student
-//        Student student = new Student();
-//        student.setUser(user); // @MapsId tự lấy studentId
-//        student.setFullName(request.getFullName());
-//        student.setAcademicYear(request.getAcademicYear());
+        return studentMapper.toStudentResponse(studentRepository.save(student));
 
-
-        studentRepository.save(student);
-        return studentMapper.toStudentResponse(student);
     }
 
     public StudentResponse updateStudent(String id, StudentUpdateRequest request){
@@ -86,9 +66,9 @@ public class StudentService {
 
     public StudentResponse getStudent(){
         var context = SecurityContextHolder.getContext();
-        String userId = context.getAuthentication().getName();
-        log.info("O trong getStudent");
-        Student student = studentRepository.findByUserUsername(userId)
+        String name = context.getAuthentication().getName();
+
+        Student student = studentRepository.findByUserUsername(name)
                 .orElseThrow(()->new RuntimeException("Student not found"));
         return studentMapper.toStudentResponse(student);
     }
