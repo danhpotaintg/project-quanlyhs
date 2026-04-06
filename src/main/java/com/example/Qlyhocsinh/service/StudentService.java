@@ -5,6 +5,8 @@ import com.example.Qlyhocsinh.dto.request.StudentUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
 import com.example.Qlyhocsinh.entity.Student;
 import com.example.Qlyhocsinh.entity.User;
+import com.example.Qlyhocsinh.exception.AppException;
+import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.StudentMapper;
 import com.example.Qlyhocsinh.mapper.UserMapper;
 import com.example.Qlyhocsinh.repository.StudentRepository;
@@ -41,13 +43,6 @@ public class StudentService {
         String username = accountService.generateUsername(request.getFullName(), studentId);
         String password = accountService.generateDefaultPassword(studentId);
 
-        // 3. Tạo User
-//        User user = User.builder()
-//                .id(studentId) // Gán ID chuẩn
-//                .username(username) // anv_K22ST00001
-//                .password(passwordEncoder.encode(password)) // Mã hóa K22ST00001
-//                .role("STUDENT")
-//                .build();
         User user = userMapper.toUser(request);
         user.setId(studentId);
         user.setUsername(username);
@@ -57,20 +52,13 @@ public class StudentService {
         Student student = studentMapper.toStudent(request);
         student.setUser(user);
 
-        // 4. Tạo Student
-//        Student student = new Student();
-//        student.setUser(user); // @MapsId tự lấy studentId
-//        student.setFullName(request.getFullName());
-//        student.setAcademicYear(request.getAcademicYear());
-
-
         studentRepository.save(student);
         return studentMapper.toStudentResponse(student);
     }
 
     public StudentResponse updateStudent(String id, StudentUpdateRequest request){
         Student student = studentRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Student not found"));
+                .orElseThrow(()-> new AppException(ErrorCode.STUDENT_NOT_FOUND));
         studentMapper.updateStudent(student, request);
 
         return studentMapper.toStudentResponse(studentRepository.save(student));
@@ -87,9 +75,9 @@ public class StudentService {
     public StudentResponse getStudent(){
         var context = SecurityContextHolder.getContext();
         String userId = context.getAuthentication().getName();
-        log.info("O trong getStudent");
+
         Student student = studentRepository.findByUserUsername(userId)
-                .orElseThrow(()->new RuntimeException("Student not found"));
+                .orElseThrow(()->new AppException(ErrorCode.STUDENT_NOT_FOUND));
         return studentMapper.toStudentResponse(student);
     }
 
