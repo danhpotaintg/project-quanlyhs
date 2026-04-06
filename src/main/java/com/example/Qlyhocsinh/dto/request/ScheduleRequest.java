@@ -15,9 +15,9 @@ public class ScheduleRequest{
     Long classId;
     String subjectId;
     String teacherId;
-    private LocalTime startTime;;
-    private LocalTime endTime;
-    private DayOfWeek dayOfWeek;
+    private int startLesson;
+    private int endLesson;
+    private int dayOfWeek;
     int semester;
     int academicYear;
 }

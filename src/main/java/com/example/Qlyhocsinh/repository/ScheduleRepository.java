@@ -13,4 +13,8 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<Schedule, String> {
     @Query("SELECT DISTINCT s.classRoom FROM Schedule s WHERE s.teacher.id = :teacherId")
     List<ClassRoom> findDistinctClassByTeacherId(@Param("teacherId") String teacherId);
+
+    List<Schedule> findByTeacherId(String teacherId);
+
+    List<Schedule> findByClassRoomId(Long classId);
 }

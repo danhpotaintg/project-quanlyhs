@@ -1,10 +1,7 @@
 package com.example.Qlyhocsinh.dto.response;
 
-import com.example.Qlyhocsinh.entity.TeacherAssignSubject;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 import java.time.LocalDate;
 

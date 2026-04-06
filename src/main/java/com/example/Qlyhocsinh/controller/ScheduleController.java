@@ -38,6 +38,20 @@ public class ScheduleController {
                 .build();
     }
 
+    @GetMapping("/teacher")
+    ApiResponse<List<ScheduleResponse>> getAllScheduleByTeacherID() {
+        return ApiResponse.<List<ScheduleResponse>>builder()
+                .result(scheduleService.getAllScheduleByTeacher())
+                .build();
+    }
+
+    @GetMapping("/student")
+    ApiResponse<List<ScheduleResponse>> getAllScheduleByStudent() {
+        return ApiResponse.<List<ScheduleResponse>>builder()
+                .result(scheduleService.getAllScheduleByStudent())
+                .build();
+    }
+
     @DeleteMapping("/{id}")
     ApiResponse<String> deledeSche(@PathVariable String id) {
         scheduleService.deleteSchedule(id);
