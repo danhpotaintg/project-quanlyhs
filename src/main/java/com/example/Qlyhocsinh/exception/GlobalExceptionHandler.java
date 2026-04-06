@@ -12,13 +12,13 @@ import org.springframework.security.access.AccessDeniedException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception){
+    ResponseEntity<ApiResponse> handlingRuntimeException(Exception exception){ // ✅ Đổi thành Exception
+        // ✅ THÊM DÒNG NÀY để xem lỗi thật trong console
+        exception.printStackTrace();
+
         ApiResponse apiResponse = new ApiResponse();
-
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
-        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-
-
+        apiResponse.setMessage(exception.getMessage()); // ✅ Tạm thời show message thật
         return ResponseEntity.badRequest().body(apiResponse);
     }
 

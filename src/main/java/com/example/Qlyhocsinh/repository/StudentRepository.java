@@ -1,7 +1,6 @@
 package com.example.Qlyhocsinh.repository;
 
 import com.example.Qlyhocsinh.entity.Student;
-import com.example.Qlyhocsinh.entity.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,7 +12,7 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, String> {
     List<Student> findByClassRoomId(Long classId);
     Optional<Student> findByUserUsername(String name);
-    Optional<Student> findByUserIdAndClassRoomId(String userId, Long classId);
+    Optional<Student> findByUserIdAndClassRoomId(String id, Long classId);
 
     @Query("SELECT s FROM Student s WHERE s.classRoom IS NULL")
     List<Student> findAllWithoutClass();

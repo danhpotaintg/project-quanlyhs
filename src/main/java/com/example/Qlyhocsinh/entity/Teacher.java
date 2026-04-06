@@ -19,7 +19,7 @@ public class Teacher {
 
     @Id
     @Column(name = "teacher_id")
-    private String userId;
+    private String id;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId

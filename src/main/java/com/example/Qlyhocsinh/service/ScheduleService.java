@@ -79,7 +79,7 @@ public class ScheduleService {
         Teacher teacher = teacherRepository.findByUserUsername(teacherName)
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
-        List<ClassRoom> classes = scheduleRepository.findDistinctClassByTeacherId(teacher.getUserId());
+        List<ClassRoom> classes = scheduleRepository.findDistinctClassByTeacherId(teacher.getId());
 
         return classMapper.toClassResponseList(classes);
     }

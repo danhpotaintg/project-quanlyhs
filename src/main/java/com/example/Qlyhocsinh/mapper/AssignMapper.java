@@ -17,6 +17,6 @@ public interface AssignMapper {
     AssignStudentClassResponse toAssignStudentClassResponse(ClassRoom classRoom, int academicYear, List<Student> students);
 
     default String mapStudentToId(Student student) {
-        return student != null ? student.getUserId() : null;
+        return student != null ? student.getId() : null;
     }
 }

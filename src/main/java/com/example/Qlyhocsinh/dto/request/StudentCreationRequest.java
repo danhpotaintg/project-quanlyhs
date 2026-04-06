@@ -12,11 +12,6 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StudentCreationRequest {
 
-    // user
-    String username;
-    String password;
-
-    // student
     String fullName;
     LocalDate dob;
     String parentGmail;

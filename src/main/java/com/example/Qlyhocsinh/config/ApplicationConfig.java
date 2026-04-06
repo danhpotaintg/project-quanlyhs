@@ -30,6 +30,7 @@ public class ApplicationConfig {
 
 
                 User user = User.builder()
+                        .id("admin001")
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
                         .role("ADMIN")
