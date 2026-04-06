@@ -3,43 +3,58 @@ package com.example.Qlyhocsinh.entity;
 import com.example.Qlyhocsinh.enums.GradeStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "grade")
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@Entity
+@Table(
+        name = "grades",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_grade_student_config_entry",
+                columnNames = {"student_id", "grade_config_id", "entry_index"}
+        )
+)
 public class Grade {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "grade_id")
-    String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(name = "student_id", nullable = false)
+    private String studentId;
 
-    int entryIndex;
-    LocalDate gradedAt;
-    String note;
+    @Column(name = "grade_config_id", nullable = false)
+    private Long gradeConfigId;
 
-    double score;
+    @Column(name = "entry_index", nullable = false)
+    private Integer entryIndex;
+
+    @Column(nullable = false, columnDefinition = "DECIMAL(4,2)")
+    private Double score;
+
+    @Column(name = "teacher_id", nullable = false)
+    private String teacherId;
 
     @Enumerated(EnumType.STRING)
-    GradeStatus status;
+    @Column(nullable = true, length = 20)
+    private GradeStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "teacher_id")
-    Teacher teacher;
+    @Column(columnDefinition = "TEXT")
+    private String note;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    Student student;
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "grade_config_id")
-    GradeConfig gradeConfig;
+    @UpdateTimestamp
+    @Column(name = "graded_at")
+    private LocalDateTime gradedAt;
+
 }

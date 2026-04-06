@@ -33,7 +33,6 @@ public class Teacher {
     @OneToOne(mappedBy = "teacher")
     private ClassRoom classRoom;
 
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeacherAssignSubject> assignSubjects;
+    private String subjectId;
 
 }

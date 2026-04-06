@@ -1,12 +1,17 @@
 package com.example.Qlyhocsinh.service;
 
+import com.example.Qlyhocsinh.dto.request.SubjectBulkRequest;
 import com.example.Qlyhocsinh.dto.request.SubjectRequest;
 import com.example.Qlyhocsinh.dto.response.SubjectResponse;
 import com.example.Qlyhocsinh.entity.Subject;
+import com.example.Qlyhocsinh.exception.AppException;
+import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.SubjectMapper;
 import com.example.Qlyhocsinh.repository.SubjectRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +42,33 @@ public class SubjectService {
 
     public void deleteSub(String id){
         subjectRepository.deleteById(id);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public List<SubjectResponse> createBulk(SubjectBulkRequest request){
+        List<String> existing = subjectRepository.findBySubjectNameIn(request.getSubjectName())
+                .stream().map(Subject::getSubjectName).toList();
+
+        List<String> duplicates = request.getSubjectName().stream()
+                .filter(existing::contains)
+                .toList();
+
+//        if(!duplicates.isEmpty()){
+//            throw new AppException(ErrorCode.SUBJECT_ALREADY_EXISTS);
+//        }
+//
+        // tự động bỏ qua những môn trùng lặp
+        List<Subject> subjects = request.getSubjectName().stream()
+                .filter(name -> !existing.contains(name))
+                .map(name -> {
+                    Subject s = new Subject();
+                    s.setSubjectName(name);
+                    return s;
+                })
+                .toList();
+
+        return subjectMapper.toSubjectResponseList(subjectRepository.saveAll(subjects));
     }
 
 }
