@@ -36,7 +36,7 @@ public class SecurityConfig {
         "/auth/logout",
         "/auth/refresh",
         "/teachers",
-        "/students"
+        "/students",
     };
 
     @Value("${jwt.signerKey}")

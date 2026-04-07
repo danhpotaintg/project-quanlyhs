@@ -9,6 +9,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+
+//chua dung duoc
 @SpringBootApplication
 @Configuration
 public class CorsConfig {

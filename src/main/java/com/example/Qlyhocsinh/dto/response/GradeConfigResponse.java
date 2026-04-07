@@ -1,5 +1,6 @@
 package com.example.Qlyhocsinh.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,14 +9,15 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GradeConfigResponse {
     String id;
 
     String subjectId;
     String subjectName;
 
-    int semester;
+    Integer semester;
     String scoreType;
-    float weight;
-    int maxEntries;
+    Double weight;
+    Integer maxEntries;
 }

@@ -1,20 +1,26 @@
 package com.example.Qlyhocsinh.dto.response;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import com.example.Qlyhocsinh.enums.GradeStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Data
 public class GradeResponse {
 
-    private String id;
+    private String studentId;
 
-    private int semester;
-    private String scoreType;
-    private float score;
+    private Long gradeConfigId;
 
+    private Integer entryIndex;
+
+    private Double score;
+
+    private String teacherId;
+
+    private GradeStatus status;
+
+    private String note;
 }

@@ -13,16 +13,16 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GradeConfig {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "grade_config_id")
-    String id;
+    Long id;
 
     int semester;
-    String score_type;
-    float weight; //he so
-    int max_entries;//số đầu điểm,  ví dụ kiểm tra 15 phút co 3 lần ktra thì 3 đầu điểm
+    String scoreType; //
+    Double weight; //he so
+    Integer maxEntries;//số đầu điểm,  ví dụ kiểm tra 15 phút co 3 lần ktra thì 3 đầu điểm
 
-    @ManyToOne
-    @JoinColumn(name = "subject_id")
-    Subject subject;
+    @Column(name = "subject_id", nullable = false)
+    String subjectId;
+
 }

@@ -9,9 +9,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GradeConfigRequest {
-    String id;
-    int semester;
-    String score_type;
-    float weight; //he so
-    int max_entries;
+
+    Integer semester;
+    String scoreType;
+    Double weight;
+    Integer maxEntries;
 }
