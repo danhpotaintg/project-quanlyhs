@@ -48,6 +48,9 @@ public class TeacherService {
         String username = accountService.generateUsername(request.getFullName(), teacherId);
         String password = accountService.generateDefaultPassword(teacherId);
 
+        Subject subject = subjectRepository.findBySubjectName(request.getSubjectName())
+                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+
         User user = userMapper.toUser(request);
         user.setId(teacherId);
         user.setUsername(username);
@@ -56,6 +59,7 @@ public class TeacherService {
 
         Teacher teacher = teacherMapper.toTeacher(request);
         teacher.setUser(user);
+        teacher.setSubject(subject);
 
         teacherRepository.save(teacher);
         return teacherMapper.toTeacherResponse(teacher);
