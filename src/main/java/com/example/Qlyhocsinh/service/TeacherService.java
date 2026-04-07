@@ -5,6 +5,7 @@ import com.example.Qlyhocsinh.dto.request.TeacherCreationRequest;
 import com.example.Qlyhocsinh.dto.request.TeacherUpdateResquest;
 import com.example.Qlyhocsinh.dto.response.TeacherResponse;
 import com.example.Qlyhocsinh.entity.ClassRoom;
+import com.example.Qlyhocsinh.entity.Subject;
 import com.example.Qlyhocsinh.entity.Teacher;
 import com.example.Qlyhocsinh.entity.User;
 import com.example.Qlyhocsinh.exception.AppException;
@@ -13,6 +14,7 @@ import com.example.Qlyhocsinh.mapper.ClassMapper;
 import com.example.Qlyhocsinh.mapper.TeacherMapper;
 import com.example.Qlyhocsinh.mapper.UserMapper;
 import com.example.Qlyhocsinh.repository.ClassRepository;
+import com.example.Qlyhocsinh.repository.SubjectRepository;
 import com.example.Qlyhocsinh.repository.TeacherRepository;
 import com.example.Qlyhocsinh.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -36,7 +38,7 @@ public class TeacherService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final FileStorageService fileStorageService;
-
+    private final SubjectRepository subjectRepository;
     private final PasswordEncoder passwordEncoder;
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -44,13 +46,17 @@ public class TeacherService {
         if(userRepository.findByUsername(request.getUsername()).isPresent()){
             throw new AppException(ErrorCode.USERNAME_EXISTED);
         }
+
+        Subject subject = subjectRepository.findBySubjectName(request.getSubjectName())
+                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole("TEACHER");
         userRepository.save(user);
 
         Teacher teacher = teacherMapper.toTeacher(request);
-
+        teacher.setSubject(subject);
         teacher.setUser(user);
         teacherRepository.save(teacher);
 
@@ -60,7 +66,7 @@ public class TeacherService {
 
     public TeacherResponse updateTeacher(String id,TeacherUpdateResquest request){
         Teacher teacher = teacherRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
         teacherMapper.toUpdateTeacher(teacher, request);
         return teacherMapper.toTeacherResponse(teacherRepository.save(teacher));
     }

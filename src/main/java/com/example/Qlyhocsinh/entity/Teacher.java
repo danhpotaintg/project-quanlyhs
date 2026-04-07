@@ -33,6 +33,8 @@ public class Teacher {
     @OneToOne(mappedBy = "teacher")
     private ClassRoom classRoom;
 
-    private String subjectId;
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
 
 }

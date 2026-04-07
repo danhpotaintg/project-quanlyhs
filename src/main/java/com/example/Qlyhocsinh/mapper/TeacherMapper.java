@@ -14,6 +14,7 @@ public interface TeacherMapper {
 
     @Mapping(source = "user.id", target = "id")
     @Mapping(source = "classRoom.className", target = "className")
+    @Mapping(source = "subject.subjectName", target = "subjectName")
     TeacherResponse toTeacherResponse(Teacher teacher);
 
 

@@ -44,6 +44,7 @@ public class SubjectService {
         subjectRepository.deleteById(id);
     }
 
+
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public List<SubjectResponse> createBulk(SubjectBulkRequest request){

@@ -25,5 +25,6 @@ public class TeacherResponse {
 
     String subjectName;
 
+    private String avatarUrl;
 
 }

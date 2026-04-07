@@ -20,6 +20,7 @@ public class StudentResponse {
     String parentGmail;
     String parentPhonenumber;
     String gender;
+    int academicYear;
 
     // user info
     UserResponse user;

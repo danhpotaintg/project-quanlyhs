@@ -23,4 +23,8 @@ public class StudentCreationRequest {
     String parentPhonenumber;
     String gender;
 
+    String className;
+    int academicYear;
+
+
 }

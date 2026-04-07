@@ -18,7 +18,7 @@ public class GradeConfig {
     Long id;
 
     int semester;
-    String scoreType;
+    String scoreType; //
     Double weight; //he so
     Integer maxEntries;//số đầu điểm,  ví dụ kiểm tra 15 phút co 3 lần ktra thì 3 đầu điểm
 

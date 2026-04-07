@@ -31,6 +31,7 @@ public enum ErrorCode {
     GRADE_SCORE_INVALID(1054, "Điểm phải từ 0 đến 10.", HttpStatus.BAD_REQUEST),
     GRADE_FORBIDDEN(1055, "Bạn không có quyền thao tác với bản ghi điểm này.", HttpStatus.FORBIDDEN),
     SUBJECT_ALREADY_EXISTS(1060, "Môn đã tồn tại", HttpStatus.CONFLICT)
+
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -25,7 +25,7 @@ public class Schedule {
     LocalTime endTime;
 
     int semester;
-    int academic_year;
+    int academicYear;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

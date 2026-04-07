@@ -5,6 +5,8 @@ import com.example.Qlyhocsinh.dto.response.ClassResponse;
 import com.example.Qlyhocsinh.entity.ClassRoom;
 import org.mapstruct.*;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = ClassMapper.class)
 public interface ClassMapper {
 
@@ -16,4 +18,5 @@ public interface ClassMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateClass(@MappingTarget ClassRoom classRoom, ClassRequest request);
 
+    List<ClassResponse> toClassResponseList(List<ClassRoom> classRooms);
 }
