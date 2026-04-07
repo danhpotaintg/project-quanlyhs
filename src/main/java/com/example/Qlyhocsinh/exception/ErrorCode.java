@@ -24,6 +24,8 @@ public enum ErrorCode {
     SUBJECT_NOT_FOUND(1015, "Môn học không tồn tại", HttpStatus.NOT_FOUND),
     SCHEDULE_NOT_FOUND(1016, "Lịch học không tồn tại", HttpStatus.NOT_FOUND),
     CLASS_HAS_TEACHER(1017, "Lớp học đã có GVCN", HttpStatus.NOT_FOUND),
+    SCHEDULE_FOR_TEACHER_EXISTED(1018, "Giáo viên trùng lịch dạy", HttpStatus.NOT_FOUND),
+    CLASS_SCHEDULE_EXISTED(1019, "Lớp học bị trùng lịch học", HttpStatus.NOT_FOUND),
 
     ;
 

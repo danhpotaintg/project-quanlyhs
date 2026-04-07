@@ -76,7 +76,7 @@ public class TeacherService {
         return tea.stream().map(teacherMapper::toTeacherResponse).toList();
     }
 
-    public TeacherResponse getTea(){
+    public TeacherResponse getTeacherInfo(){
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 

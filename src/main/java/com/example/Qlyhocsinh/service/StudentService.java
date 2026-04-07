@@ -72,7 +72,7 @@ public class StudentService {
         return studentMapper.toStudentResponseList(studentRepository.findAll());
     }
 
-    public StudentResponse getStudent(){
+    public StudentResponse getStudentInfo(){
         var context = SecurityContextHolder.getContext();
         String userId = context.getAuthentication().getName();
 
