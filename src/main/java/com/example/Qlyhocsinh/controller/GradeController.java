@@ -33,11 +33,12 @@ public class GradeController {
 
     @PostMapping("/{studentId}/{gradeConfigId}")
     public ApiResponse<GradeResponse> createGrade(@Valid @RequestBody GradeRequest request,
+                                                  @RequestParam Integer entryIndex,
                                                   @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
                                                   @PathVariable String studentId, @PathVariable Long gradeConfigId) {
         String teacherId = jwt.getClaim("userId");
         return ApiResponse.<GradeResponse>builder()
-                .result(gradeService.saveGrade(request, teacherId, gradeConfigId, studentId))
+                .result(gradeService.saveGrade(request, entryIndex, teacherId, gradeConfigId, studentId))
                 .build();
     }
 

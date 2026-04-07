@@ -40,13 +40,13 @@ public class GradeService {
     //  nhập 1 điểm cho 1 học sinh (tạo và sửa điểm cho 1)
     @PreAuthorize("hasRole('TEACHER')")
     @Transactional
-    public GradeResponse saveGrade(GradeRequest request, String teacherId, Long gradeConfigId, String studentId){
+    public GradeResponse saveGrade(GradeRequest request,Integer entryIndex, String teacherId, Long gradeConfigId, String studentId){
         GradeConfig gradeConfig = gradeConfigRepository.findById(gradeConfigId)
                 .orElseThrow(() -> new AppException(ErrorCode.GRADE_CONFIG_NOT_FOUND));
 
-        validateEntryIndex(request.getEntryIndex(), gradeConfig.getMaxEntries());
+        validateEntryIndex(entryIndex, gradeConfig.getMaxEntries());
 
-        Grade grade = gradeRepository.findByStudentIdAndGradeConfigIdAndEntryIndex(studentId, gradeConfigId, request.getEntryIndex())
+        Grade grade = gradeRepository.findByStudentIdAndGradeConfigIdAndEntryIndex(studentId, gradeConfigId, entryIndex)
                 .orElse(new Grade());
 
         if(grade.getId() == null){
@@ -56,7 +56,7 @@ public class GradeService {
         }
 
         grade.setScore(request.getScore());
-        grade.setEntryIndex(request.getEntryIndex());
+        grade.setEntryIndex(entryIndex);
 
         return gradeMapper.toResponse(gradeRepository.save(grade));
     }

@@ -20,9 +20,9 @@ public class GradeRequest {
 //    @Positive(message = "grade_config_id phải là số dương")
 //    private Long gradeConfigId;
 
-    @NotNull(message = "entry_index không được để trống")
-    @Min(value = 1, message = "entry_index phải >= 1")
-    private Integer entryIndex;
+//    @NotNull(message = "entry_index không được để trống")
+//    @Min(value = 1, message = "entry_index phải >= 1")
+//    private Integer entryIndex;
 
     @NotNull(message = "score không được để trống")
     @DecimalMin(value = "0.0", inclusive = true, message = "Điểm phải >= 0")
