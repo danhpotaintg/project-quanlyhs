@@ -16,12 +16,11 @@ public interface SubjectRepository extends JpaRepository<Subject, String> {
     List<Subject> findBySubjectNameIn(List<String> subjectName);
 
     @Query(value = """
-        SELECT DISTINCT sub.subject_id  AS id,
-                        sub.subject_name AS subjectName
+        SELECT DISTINCT sub.*
         FROM subject sub
         JOIN schedule sc ON sc.subject_id = sub.subject_id
         WHERE sc.class_id = :classId
-            AND sc.semester = :semester
+        AND sc.semester = :semester
     """, nativeQuery = true)
     List<Subject> findByClassIdAndSemester(
             @Param("classId") Long classId,

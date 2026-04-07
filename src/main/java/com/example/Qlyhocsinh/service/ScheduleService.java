@@ -37,6 +37,8 @@ public class ScheduleService {
 
         Teacher teacher = teacherRepository.findById(request.getTeacherId())
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+        if(!teacher.getSubject().getId().equals(request.getSubjectId()))
+            throw new AppException(ErrorCode.TEACHER_DOESNT_HAVE_SUBJECT);
 
         Subject subject = subjectRepository.findById(request.getSubjectId())
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));

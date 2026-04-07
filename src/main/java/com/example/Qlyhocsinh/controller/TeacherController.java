@@ -3,7 +3,9 @@ package com.example.Qlyhocsinh.controller;
 import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.TeacherCreationRequest;
 import com.example.Qlyhocsinh.dto.request.TeacherUpdateResquest;
+import com.example.Qlyhocsinh.dto.response.SubjectResponse;
 import com.example.Qlyhocsinh.dto.response.TeacherResponse;
+import com.example.Qlyhocsinh.service.SubjectService;
 import com.example.Qlyhocsinh.service.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +20,7 @@ import java.util.List;
 public class TeacherController {
 
     private final TeacherService teacherService;
-
+    private final SubjectService subjectService;
     @PostMapping
     ApiResponse<TeacherResponse> createTeacher(@RequestBody TeacherCreationRequest request) {
         return ApiResponse.<TeacherResponse>builder()
@@ -52,6 +54,13 @@ public class TeacherController {
     ApiResponse<TeacherResponse> getTeacher() {
         return ApiResponse.<TeacherResponse>builder()
                 .result(teacherService.getTeacherInfo())
+                .build();
+    }
+
+    @GetMapping("/subject")
+    ApiResponse<SubjectResponse> getSubjectByTeacherId(){
+        return ApiResponse.<SubjectResponse>builder()
+                .result(subjectService.getSubjectByTeacherId())
                 .build();
     }
 

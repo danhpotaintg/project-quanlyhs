@@ -5,16 +5,19 @@ import com.example.Qlyhocsinh.dto.request.SubjectRequest;
 import com.example.Qlyhocsinh.dto.response.SubjectResponse;
 import com.example.Qlyhocsinh.entity.Student;
 import com.example.Qlyhocsinh.entity.Subject;
+import com.example.Qlyhocsinh.entity.Teacher;
 import com.example.Qlyhocsinh.exception.AppException;
 import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.SubjectMapper;
 import com.example.Qlyhocsinh.repository.StudentRepository;
 import com.example.Qlyhocsinh.repository.SubjectRepository;
+import com.example.Qlyhocsinh.repository.TeacherRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ public class SubjectService {
     private final SubjectRepository subjectRepository;
     private final SubjectMapper subjectMapper;
     private final StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
 
     public SubjectResponse createSub(SubjectRequest request){
         Subject subject = subjectMapper.tosubject(request);
@@ -96,5 +100,15 @@ public class SubjectService {
     }
 
 
+    public SubjectResponse getSubjectByTeacherId(){
+        var context = SecurityContextHolder.getContext();
+        String teacherName = context.getAuthentication().getName();
 
+        Teacher teacher = teacherRepository.findByUserUsername(teacherName)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+
+        Subject subject = teacher.getSubject();
+
+        return subjectMapper.toSubjectResponse(subject);
+    }
 }
