@@ -51,7 +51,7 @@ public class TeacherController {
     @GetMapping("/my-info")
     ApiResponse<TeacherResponse> getTeacher() {
         return ApiResponse.<TeacherResponse>builder()
-                .result(teacherService.getTea())
+                .result(teacherService.getTeacherInfo())
                 .build();
     }
 

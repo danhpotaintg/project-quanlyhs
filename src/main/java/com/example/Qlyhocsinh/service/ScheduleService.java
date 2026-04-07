@@ -29,7 +29,7 @@ public class ScheduleService {
     private final SubjectRepository subjectRepository;
     private final ClassMapper classMapper;
     private final StudentRepository studentRepository;
-    private final StudentMapper studentMapper;
+
 
     public ScheduleResponse createSchedule(ScheduleRequest request){
         ClassRoom classRoom = classRepository.findById(request.getClassId())
@@ -41,6 +41,23 @@ public class ScheduleService {
         Subject subject = subjectRepository.findById(request.getSubjectId())
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
 
+        List<Schedule> scheduleExisted = scheduleRepository.findScheduleConflicts(
+                request.getAcademicYear(),
+                request.getSemester(),
+                request.getDayOfWeek(),
+                request.getStartLesson(),
+                request.getEndLesson()
+        );
+
+        for(Schedule s : scheduleExisted){
+            if(s.getTeacher().getId().equals(request.getTeacherId())){
+                throw new AppException(ErrorCode.SCHEDULE_FOR_TEACHER_EXISTED);
+            }
+            if(s.getClassRoom().getId().equals(request.getClassId())){
+                throw new AppException(ErrorCode.CLASS_SCHEDULE_EXISTED);
+            }
+        }
+
         Schedule schedule = scheduleMapper.toSchedule(request);
         schedule.setClassRoom(classRoom);
         schedule.setTeacher(teacher);
@@ -51,7 +68,7 @@ public class ScheduleService {
 
     public ScheduleResponse updateSchedule(String id, ScheduleRequest request){
         Schedule schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Schedule not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.SCHEDULE_NOT_FOUND));
 
         scheduleMapper.updateSchedule(schedule, request);
 
@@ -64,7 +81,7 @@ public class ScheduleService {
 
     public ScheduleResponse getById(String id){
         Schedule schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Schedule not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.SCHEDULE_NOT_FOUND));
 
         return scheduleMapper.toScheduleResponse(schedule);
     }

@@ -49,7 +49,7 @@ public class StudentController {
     @GetMapping("/my-info")
     ApiResponse<StudentResponse> getStudent() {
         return ApiResponse.<StudentResponse>builder()
-                .result(studentService.getStudent())
+                .result(studentService.getStudentInfo())
                 .build();
     }
 

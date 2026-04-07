@@ -25,6 +25,8 @@ public enum ErrorCode {
     SCHEDULE_NOT_FOUND(1016, "Lịch học không tồn tại", HttpStatus.NOT_FOUND),
     GRADE_CONFIG_NOT_FOUND(1017, "Đầu điểm không tồn tại", HttpStatus.NOT_FOUND),
     CLASS_HAS_TEACHER(1017, "Lớp học đã có GVCN", HttpStatus.NOT_FOUND),
+    SCHEDULE_FOR_TEACHER_EXISTED(1018, "Giáo viên trùng lịch dạy", HttpStatus.NOT_FOUND),
+    CLASS_SCHEDULE_EXISTED(1019, "Lớp học bị trùng lịch học", HttpStatus.NOT_FOUND),
     GRADE_NOT_FOUND(1050, "Không tìm thấy bản ghi điểm.", HttpStatus.NOT_FOUND),
     GRADE_ALREADY_EXISTS(1051, "Điểm đã tồn tại. Dùng PUT để cập nhật.", HttpStatus.CONFLICT),
     GRADE_ENTRY_INDEX_INVALID(1053, "entry_index vượt quá số lần nhập cho phép.", HttpStatus.BAD_REQUEST),

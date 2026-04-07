@@ -11,10 +11,24 @@ import java.util.List;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, String> {
+    //lấy danh sách lớp giáo viên dang dạy
     @Query("SELECT DISTINCT s.classRoom FROM Schedule s WHERE s.teacher.id = :teacherId")
     List<ClassRoom> findDistinctClassByTeacherId(@Param("teacherId") String teacherId);
 
     List<Schedule> findByTeacherId(String teacherId);
 
     List<Schedule> findByClassRoomId(Long classId);
+
+    //kiểm tra trùng lịch
+    @Query("SELECT s FROM Schedule s WHERE s.academicYear = :year " +
+            "AND s.semester = :semester " +
+            "AND s.dayOfWeek = :day " +
+            "AND ((s.startLesson <= :end AND s.endLesson >= :start))")
+    List<Schedule> findScheduleConflicts(
+            int year,
+            int semester,
+            int day,
+            int start,
+            int end
+    );
 }

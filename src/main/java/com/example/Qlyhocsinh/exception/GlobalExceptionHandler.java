@@ -26,6 +26,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(apiResponse);
     }
+
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handlingRuntimeException(AppException exception){
         ErrorCode errorCode = exception.getErrorCode();
