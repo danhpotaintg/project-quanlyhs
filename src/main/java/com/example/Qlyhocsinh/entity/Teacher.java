@@ -29,6 +29,8 @@ public class Teacher {
     private String fullName;
     private LocalDate dob;
     private String gender;
+    private String email;
+    private String phoneNumber;
 
     @OneToOne(mappedBy = "teacher")
     private ClassRoom classRoom;

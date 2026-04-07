@@ -20,5 +20,6 @@ public class TeacherUpdateResquest {
     private String fullName;
     private LocalDate dob;
     private String gender;
-
+    private String email;
+    private String phoneNumber;
 }

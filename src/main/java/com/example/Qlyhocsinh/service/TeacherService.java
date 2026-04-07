@@ -4,10 +4,7 @@ package com.example.Qlyhocsinh.service;
 import com.example.Qlyhocsinh.dto.request.TeacherCreationRequest;
 import com.example.Qlyhocsinh.dto.request.TeacherUpdateResquest;
 import com.example.Qlyhocsinh.dto.response.TeacherResponse;
-import com.example.Qlyhocsinh.entity.ClassRoom;
-import com.example.Qlyhocsinh.entity.Subject;
-import com.example.Qlyhocsinh.entity.Teacher;
-import com.example.Qlyhocsinh.entity.User;
+import com.example.Qlyhocsinh.entity.*;
 import com.example.Qlyhocsinh.exception.AppException;
 import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.ClassMapper;
@@ -40,28 +37,28 @@ public class TeacherService {
     private final FileStorageService fileStorageService;
     private final SubjectRepository subjectRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AccountService accountService;
+    private final IdGeneratorService idGeneratorService;
 
     @PreAuthorize("hasRole('ADMIN')")
     public TeacherResponse createTeacher(TeacherCreationRequest request){
-        if(userRepository.findByUsername(request.getUsername()).isPresent()){
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
-        }
+        String teacherId = idGeneratorService.generateId("TEACHER", String.valueOf(request.getDob()), request.getDob().getYear());
 
-        Subject subject = subjectRepository.findBySubjectName(request.getSubjectName())
-                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+        // 2. Sinh Username và Password
+        String username = accountService.generateUsername(request.getFullName(), teacherId);
+        String password = accountService.generateDefaultPassword(teacherId);
 
         User user = userMapper.toUser(request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setId(teacherId);
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
         user.setRole("TEACHER");
-        userRepository.save(user);
 
         Teacher teacher = teacherMapper.toTeacher(request);
-        teacher.setSubject(subject);
         teacher.setUser(user);
+
         teacherRepository.save(teacher);
-
         return teacherMapper.toTeacherResponse(teacher);
-
     }
 
     public TeacherResponse updateTeacher(String id,TeacherUpdateResquest request){
