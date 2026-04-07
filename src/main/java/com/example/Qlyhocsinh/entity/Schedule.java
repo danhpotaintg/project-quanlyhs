@@ -21,15 +21,13 @@ public class Schedule {
     @Column(name = "schedule_id", nullable = false)
     String id;
 
-    LocalTime startTime;
-    LocalTime endTime;
+    int startLesson;
+    int endLesson;
 
     int semester;
     int academicYear;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    DayOfWeek dayOfWeek;
+    int dayOfWeek;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")

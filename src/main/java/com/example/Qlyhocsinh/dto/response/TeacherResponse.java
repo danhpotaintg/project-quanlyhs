@@ -1,10 +1,7 @@
 package com.example.Qlyhocsinh.dto.response;
 
-import com.example.Qlyhocsinh.entity.TeacherAssignSubject;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 import java.time.LocalDate;
 
@@ -19,6 +16,8 @@ public class TeacherResponse {
     String fullName;;
     LocalDate dob;
     String gender;
+    String email;
+    String phoneNumber;
     UserResponse user;
 
     String className;

@@ -31,7 +31,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
-public class UserService {
+public class    UserService {
     UserRepository userRepository;
     UserMapper userMapper;
 
@@ -98,7 +98,7 @@ public class UserService {
     }
 
 
-    @PostAuthorize("returnObject.username == authentication.name")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUser(String id){
         log.info("O trong method getUser by ID");
         return userMapper.toUserResponse(userRepository.findById(id)
@@ -109,7 +109,7 @@ public class UserService {
     public UserResponse getMyInfo(){
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
-
+        log.info("o trong getMyInfo");
          User user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 

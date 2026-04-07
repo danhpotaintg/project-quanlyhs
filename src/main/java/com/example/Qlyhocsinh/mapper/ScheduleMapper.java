@@ -16,7 +16,7 @@ public interface ScheduleMapper {
     @Mapping(source = "classRoom.className", target = "className")
     @Mapping(source = "subject.id", target = "subjectId")
     @Mapping(source = "subject.subjectName", target = "subjectName")
-    @Mapping(source = "teacher.userId", target = "teacherId")
+    @Mapping(source = "teacher.id", target = "teacherId")
     @Mapping(source = "teacher.fullName", target = "teacherName")
     ScheduleResponse toScheduleResponse(Schedule schedule);
 

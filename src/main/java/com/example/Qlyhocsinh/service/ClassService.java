@@ -92,7 +92,7 @@ public class ClassService {
 
         List<Student> studentValidIDs = studentRepository.findAllWithoutClass()
                 .stream()
-                .filter(s -> request.getStudentIds().contains(s.getUserId()))
+                .filter(s -> request.getStudentIds().contains(s.getId()))
                 .toList();
 
 
@@ -179,7 +179,7 @@ public class ClassService {
             throw new RuntimeException("Class does not have teacher");
         }
 
-        if(! classRoom.getTeacher().getUserId().equals(teacherId)){
+        if(! classRoom.getTeacher().getId().equals(teacherId)){
             throw new RuntimeException("Teacher does not assigned to this class");
         }
 

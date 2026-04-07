@@ -5,13 +5,18 @@ import com.example.Qlyhocsinh.dto.request.GradeBatchRequest;
 import com.example.Qlyhocsinh.dto.request.GradeRequest;
 import com.example.Qlyhocsinh.dto.response.ClassGradeSheetResponse;
 import com.example.Qlyhocsinh.dto.response.GradeResponse;
+import com.example.Qlyhocsinh.dto.response.StudentGradeResponse;
 import com.example.Qlyhocsinh.entity.Grade;
 import com.example.Qlyhocsinh.entity.GradeConfig;
+import com.example.Qlyhocsinh.entity.Student;
+import com.example.Qlyhocsinh.entity.Subject;
 import com.example.Qlyhocsinh.exception.AppException;
 import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.GradeMapper;
 import com.example.Qlyhocsinh.repository.GradeConfigRepository;
 import com.example.Qlyhocsinh.repository.GradeRepository;
+import com.example.Qlyhocsinh.repository.StudentRepository;
+import com.example.Qlyhocsinh.repository.SubjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +34,8 @@ public class GradeService {
     private final GradeRepository gradeRepository;
     private final GradeMapper gradeMapper;
     private final GradeConfigRepository gradeConfigRepository;
+    private final StudentRepository studentRepository;
+    private final SubjectRepository subjectRepository;
 
     //  nhập 1 điểm cho 1 học sinh (tạo và sửa điểm cho 1)
     @PreAuthorize("hasRole('TEACHER')")
@@ -86,64 +93,6 @@ public class GradeService {
     }
 
     // lấy điểm học sinh 1 lớp theo môn và kì học
-//    @PreAuthorize("hasRole('TEACHER')")
-//    public ClassGradeSheetResponse getGradeSheet(Long classId, String subjectId,
-//                                                 Integer semester, String teacherId) {
-//
-//        List<GradeRawRow> rawRows = gradeRepository.findGradeSheet(classId, subjectId, semester);
-//        if (rawRows.isEmpty()) {
-//            throw new AppException(ErrorCode.STUDENT_NOT_FOUND);
-//        }
-//
-//        // Build gradeConfigs từ raw rows
-//        List<ClassGradeSheetResponse.GradeConfigDto> configDtos = rawRows.stream()
-//                .collect(Collectors.collectingAndThen(
-//                        Collectors.toMap(
-//                                GradeRawRow::getGradeConfigId,
-//                                r -> ClassGradeSheetResponse.GradeConfigDto.builder()
-//                                        .id(r.getGradeConfigId())
-//                                        .scoreType(r.getGradeConfigName())
-//                                        .maxEntries(r.getMaxEntries())
-//                                        .weight(r.getWeight())
-//                                        .semester(r.getSemester())
-//                                        .build(),
-//                                (existing, duplicate) -> existing,
-//                                LinkedHashMap::new
-//                        ),
-//                        map -> new ArrayList<>(map.values())
-//                ));
-//
-//        // Build student rows
-//        Map<String, List<GradeRawRow>> groupedByStudent = rawRows.stream()
-//                .collect(Collectors.groupingBy(
-//                        GradeRawRow::getStudentId,
-//                        LinkedHashMap::new,
-//                        Collectors.toList()
-//                ));
-//
-//        List<ClassGradeSheetResponse.StudentGradeRow> studentRows = groupedByStudent.entrySet().stream()
-//                .map(entry -> {
-//                    Map<String, Double> scores = entry.getValue().stream()
-//                            .filter(row -> row.getScore() != null)
-//                            .collect(Collectors.toMap(
-//                                    row -> row.getGradeConfigId() + "_" + row.getEntryIndex(),
-//                                    GradeRawRow::getScore
-//                            ));
-//
-//                    return ClassGradeSheetResponse.StudentGradeRow.builder()
-//                            .studentId(entry.getKey())
-//                            .studentName(entry.getValue().get(0).getStudentName())
-//                            .scores(scores)
-//                            .build();
-//                })
-//                .toList();
-//
-//        return ClassGradeSheetResponse.builder()
-//                .gradeConfigs(configDtos)
-//                .students(studentRows)
-//                .build();
-//    }
-
     @PreAuthorize("hasRole('TEACHER')")
     public ClassGradeSheetResponse getGradeSheet(Long classId, String subjectId,
                                                  Integer semester, String teacherId) {
@@ -227,6 +176,69 @@ public class GradeService {
                 .students(studentRows)
                 .build();
     }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @Transactional
+    public StudentGradeResponse getGradesBySubject(String studentId, String subjectId, Integer semester){
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+        List<GradeRawRow> grades = gradeRepository.findStudentGradeBySubject(studentId, subjectId, semester);
+
+        if(grades.isEmpty()) throw new AppException(ErrorCode.GRADE_CONFIG_NOT_FOUND);
+
+        Map<Long, List<GradeRawRow>> grouped = new LinkedHashMap<>();
+
+        for (GradeRawRow row : grades){
+            Long configId = row.getGradeConfigId();
+
+            if (!grouped.containsKey(configId)) {
+                grouped.put(configId, new ArrayList<>());
+            }
+            grouped.get(configId).add(row);
+        }
+
+        List<StudentGradeResponse.GradeConfigDetail> gradeConfigs = new ArrayList<>();
+
+        for (Map.Entry<Long, List<GradeRawRow>> entry : grouped.entrySet()) {
+
+            Long gradeConfigId = entry.getKey();
+            List<GradeRawRow> rows = entry.getValue();
+
+            // Sắp xếp theo entryIndex (lần nhập điểm)
+            rows.sort(Comparator.comparing(GradeRawRow::getEntryIndex));
+
+            // Lấy danh sách điểm
+            List<Double> scores = new ArrayList<>();
+            for (GradeRawRow row : rows) {
+                scores.add(row.getScore()); // có thể null
+            }
+
+            // Lấy thông tin config từ row đầu tiên
+            GradeRawRow firstRow = rows.get(0);
+
+            StudentGradeResponse.GradeConfigDetail detail =
+                    StudentGradeResponse.GradeConfigDetail.builder()
+                            .gradeConfigId(gradeConfigId)
+                            .scoreType(firstRow.getGradeConfigName())
+                            .weight(firstRow.getWeight())
+                            .maxEntries(firstRow.getMaxEntries())
+                            .scores(scores)
+                            .build();
+
+            gradeConfigs.add(detail);
+        }
+
+        return StudentGradeResponse.builder()
+                .subjectId(subjectId)
+                .subjectName(subject.getSubjectName())
+                .semester(semester)
+                .gradeConfigs(gradeConfigs)
+                .build();
+    }
+
 
     private void validateEntryIndex(Integer entryIndex, Integer maxEntries) {
         if (entryIndex < 1 || entryIndex > maxEntries) {

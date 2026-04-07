@@ -5,12 +5,14 @@ import com.example.Qlyhocsinh.dto.request.GradeBatchRequest;
 import com.example.Qlyhocsinh.dto.request.GradeRequest;
 import com.example.Qlyhocsinh.dto.response.ClassGradeSheetResponse;
 import com.example.Qlyhocsinh.dto.response.GradeResponse;
-import com.example.Qlyhocsinh.entity.Grade;
+import com.example.Qlyhocsinh.dto.response.StudentGradeResponse;
+import com.example.Qlyhocsinh.dto.response.SubjectResponse;
 import com.example.Qlyhocsinh.service.GradeService;
+import com.example.Qlyhocsinh.service.SubjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.List;
 public class GradeController {
 
     private final GradeService gradeService;
+    private final SubjectService subjectService;
 
     /**
      * POST /quanly/grades
@@ -31,7 +34,7 @@ public class GradeController {
     @PostMapping("/{studentId}/{gradeConfigId}")
     public ApiResponse<GradeResponse> createGrade(@Valid @RequestBody GradeRequest request,
                                                   @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
-                                                  @PathVariable String studentId, @PathVariable Long gradeConfigId){
+                                                  @PathVariable String studentId, @PathVariable Long gradeConfigId) {
         String teacherId = jwt.getClaim("userId");
         return ApiResponse.<GradeResponse>builder()
                 .result(gradeService.saveGrade(request, teacherId, gradeConfigId, studentId))
@@ -43,11 +46,11 @@ public class GradeController {
      * Nhập điểm các đầu điểm cho học sinh
      * Chỉ TEACHER mới được nhập điểm. File Json ví dụ: gửi request
      * {
-     *   "entries": [
-     *     { "gradeConfigId": 1, "entryIndex": 1, "score": 8.0 },
-     *     { "gradeConfigId": 1, "entryIndex": 3, "score": 9.0 },
-     *     { "gradeConfigId": 2, "entryIndex": 1, "score": 8.5 }
-     *   ]
+     * "entries": [
+     * { "gradeConfigId": 1, "entryIndex": 1, "score": 8.0 },
+     * { "gradeConfigId": 1, "entryIndex": 3, "score": 9.0 },
+     * { "gradeConfigId": 2, "entryIndex": 1, "score": 8.5 }
+     * ]
      * }
      */
 
@@ -55,7 +58,7 @@ public class GradeController {
     @PostMapping("/{studentId}/batch")
     public ApiResponse<List<GradeResponse>> saveBatch(@PathVariable String studentId,
                                                       @RequestBody GradeBatchRequest request,
-                                                      @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt){
+                                                      @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
         String teacherId = jwt.getClaim("userId");
         return ApiResponse.<List<GradeResponse>>builder()
                 .result(gradeService.saveBatch(studentId, request.getEntries(), teacherId))
@@ -63,10 +66,10 @@ public class GradeController {
     }
 
     @GetMapping("/class/{classId}/subject/{subjectId}")
-    public  ApiResponse<ClassGradeSheetResponse> getGradeSheet(@PathVariable Long classId,
-                                                               @PathVariable String subjectId,
-                                                               @RequestParam Integer semester,
-                                                               @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt){
+    public ApiResponse<ClassGradeSheetResponse> getGradeSheet(@PathVariable Long classId,
+                                                              @PathVariable String subjectId,
+                                                              @RequestParam Integer semester,
+                                                              @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
         String teacherId = jwt.getClaimAsString("userId");
         return ApiResponse.<ClassGradeSheetResponse>builder()
                 .result(gradeService.getGradeSheet(classId, subjectId, semester, teacherId))
@@ -75,6 +78,26 @@ public class GradeController {
     }
 
 
+    @GetMapping("/student/subjects")
+    public ApiResponse<List<SubjectResponse>> getSubjects(
+            @RequestParam Integer semester,
+            @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
+        String studentId = jwt.getClaimAsString("userId");
+        return ApiResponse.<List<SubjectResponse>>builder()
+                .result(subjectService.getSubjectsInSemester(studentId, semester))
+                .build();
 
+    }
 
+    @GetMapping("/student/subject/{subjectId}")
+    public ApiResponse<StudentGradeResponse> getGradesBySubject(
+            @PathVariable String subjectId,
+            @RequestParam Integer semester,
+            @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
+        String studentId = jwt.getClaimAsString("userId");
+        return ApiResponse.<StudentGradeResponse>builder()
+                .result(gradeService.getGradesBySubject(studentId, subjectId, semester))
+                .build();
+
+    }
 }

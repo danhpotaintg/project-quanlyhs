@@ -3,8 +3,6 @@ package com.example.Qlyhocsinh.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
@@ -22,9 +20,9 @@ public class ScheduleResponse {
 
     String teacherId;
     String teacherName;
-    private LocalTime startTime;;
-    private LocalTime endTime;
-    private DayOfWeek dayOfWeek;
+    private int startLesson;
+    private int endLesson;
+    private int dayOfWeek;
 
     int semester;
     int academicYear;

@@ -17,7 +17,7 @@ public class Student {
 
     @Id
     @Column(name = "student_id")
-    String userId;
+    String id;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId
