@@ -19,6 +19,7 @@ public class StudentPreviewCreationResponse {
     String parentPhonenumber;
     String gender;
     int academicYear;
+    String className;
 
     boolean valid;
     String errorNote;

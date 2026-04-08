@@ -42,7 +42,7 @@ public class TeacherService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public TeacherResponse createTeacher(TeacherCreationRequest request){
-        String teacherId = idGeneratorService.generateId("TEACHER", String.valueOf(request.getDob()), request.getDob().getYear());
+        String teacherId = idGeneratorService.generateId("TEACHER", "ALL", request.getDob().getYear());
 
         // 2. Sinh Username và Password
         String username = accountService.generateUsername(request.getFullName(), teacherId);

@@ -32,9 +32,11 @@ public enum ErrorCode {
     GRADE_ENTRY_INDEX_INVALID(1053, "entry_index vượt quá số lần nhập cho phép.", HttpStatus.BAD_REQUEST),
     GRADE_SCORE_INVALID(1054, "Điểm phải từ 0 đến 10.", HttpStatus.BAD_REQUEST),
     GRADE_FORBIDDEN(1055, "Bạn không có quyền thao tác với bản ghi điểm này.", HttpStatus.FORBIDDEN),
-    SUBJECT_ALREADY_EXISTS(1060, "Môn đã tồn tại", HttpStatus.CONFLICT)
-
+    SUBJECT_ALREADY_EXISTS(1060, "Môn đã tồn tại", HttpStatus.CONFLICT),
+    FILE_EMPTY(1018, "File tải lên không có dữ liệu",HttpStatus.BAD_REQUEST),
+    FILE_READ_ERROR(1019, "Lỗi đọc file. Vui lòng đảm bảo file đúng định dạng Excel (.xlsx)", HttpStatus.BAD_REQUEST)
     ;
+
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

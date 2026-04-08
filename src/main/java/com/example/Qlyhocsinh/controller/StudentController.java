@@ -3,10 +3,16 @@ package com.example.Qlyhocsinh.controller;
 import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.StudentCreationRequest;
 import com.example.Qlyhocsinh.dto.request.StudentUpdateRequest;
+import com.example.Qlyhocsinh.dto.response.StudentPreviewCreationResponse;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
+import com.example.Qlyhocsinh.service.StudentImportService;
 import com.example.Qlyhocsinh.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentController {
 
+    private final StudentImportService studentImportService;
     private final StudentService studentService;
 
     @PostMapping
@@ -53,4 +60,20 @@ public class StudentController {
                 .build();
     }
 
+    @PostMapping("/import/preview")
+    public ApiResponse<List<StudentPreviewCreationResponse>> getPreview(@RequestParam("file") MultipartFile file) throws Exception {
+        return ApiResponse.<List<StudentPreviewCreationResponse>>builder()
+                .result(studentImportService.previewData(file))
+                .build();
+    }
+
+    @PostMapping("/import/confirm")
+    public ApiResponse<String> confirmImport(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("mode") String mode) throws Exception {
+
+        return ApiResponse.<String>builder()
+                .result(studentImportService.confirmImport(file, mode))
+                .build();
+    }
 }
