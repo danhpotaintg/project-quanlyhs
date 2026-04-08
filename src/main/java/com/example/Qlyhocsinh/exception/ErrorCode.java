@@ -34,7 +34,10 @@ public enum ErrorCode {
     GRADE_FORBIDDEN(1055, "Bạn không có quyền thao tác với bản ghi điểm này.", HttpStatus.FORBIDDEN),
     SUBJECT_ALREADY_EXISTS(1060, "Môn đã tồn tại", HttpStatus.CONFLICT),
     TEACHER_DOESNT_HAVE_SUBJECT(1021, "Giáo viên không dạy môn này", HttpStatus.BAD_REQUEST),
+    FILE_EMPTY(1018, "File tải lên không có dữ liệu",HttpStatus.BAD_REQUEST),
+    FILE_READ_ERROR(1019, "Lỗi đọc file. Vui lòng đảm bảo file đúng định dạng Excel (.xlsx)", HttpStatus.BAD_REQUEST)
     ;
+
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
