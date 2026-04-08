@@ -3,7 +3,8 @@ package com.example.Qlyhocsinh.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
+
 
 @Data
 @AllArgsConstructor
@@ -12,8 +13,10 @@ import java.time.LocalTime;
 @FieldDefaults(level =  AccessLevel.PRIVATE)
 public class AttendanceResponse {
 
-    String id;
-    LocalTime checkInTime;
+    Long id;
+    LocalDateTime checkInTime;
     String status;
+    String studentName;
+    String teacherName;
 
 }

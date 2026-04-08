@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @FieldDefaults(level =  AccessLevel.PRIVATE)
 public class AttendanceRequest {
 
-    LocalTime checkInTime;
+    String studentId;
     String status;
 
 }

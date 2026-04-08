@@ -12,6 +12,8 @@ public interface AttendanceMapper {
 
     Attendance toAttendance(AttendanceRequest request);
 
+    @Mapping(source = "student.fullName", target = "studentName")
+    @Mapping(source = "teacher.fullName", target = "teacherName")
     AttendanceResponse toAttendanceResponse(Attendance attendance);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

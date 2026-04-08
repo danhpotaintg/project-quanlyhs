@@ -5,7 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -21,8 +22,8 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    LocalTime checkInTime;
-    String note;
+    LocalDateTime checkInTime;
+
 
     @Enumerated(EnumType.STRING)
     AttendanceStatus status;
@@ -30,10 +31,6 @@ public class Attendance {
     @ManyToOne
     @JoinColumn(name = "student_id")
     Student student;
-
-    @ManyToOne
-    @JoinColumn(name = "schedule_id")
-    Schedule schedule;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
