@@ -13,7 +13,7 @@ import java.time.LocalTime;
 @FieldDefaults(level =  AccessLevel.PRIVATE)
 public class ScheduleRequest{
     Long classId;
-    String subjectId;
+    String subjectName;
     String teacherId;
     private int startLesson;
     private int endLesson;

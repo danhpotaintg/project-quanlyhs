@@ -33,6 +33,9 @@ public class SubjectService {
     private final TeacherRepository teacherRepository;
 
     public SubjectResponse createSub(SubjectRequest request){
+        if(subjectRepository.findBySubjectName(request.getSubjectName()).isPresent())
+                throw new AppException(ErrorCode.SUBJECT_ALREADY_EXISTS);
+
         Subject subject = subjectMapper.tosubject(request);
         subjectRepository.save(subject);
         return subjectMapper.toSubjectResponse(subject);

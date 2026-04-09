@@ -35,13 +35,16 @@ public class ScheduleService {
         ClassRoom classRoom = classRepository.findById(request.getClassId())
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
 
+        Subject subject = subjectRepository.findBySubjectName(request.getSubjectName())
+                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+
         Teacher teacher = teacherRepository.findById(request.getTeacherId())
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
-        if(!teacher.getSubject().getId().equals(request.getSubjectId()))
+
+        if(!teacher.getSubject().getId().equals(subject.getId()))
             throw new AppException(ErrorCode.TEACHER_DOESNT_HAVE_SUBJECT);
 
-        Subject subject = subjectRepository.findById(request.getSubjectId())
-                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+
 
         List<Schedule> scheduleExisted = scheduleRepository.findScheduleConflicts(
                 request.getAcademicYear(),
@@ -122,6 +125,13 @@ public class ScheduleService {
         List<Schedule> schedules = scheduleRepository.findByClassRoomId(student.getClassRoom().getId());
 
         return scheduleMapper.toScheduleResponseList(schedules);
+    }
+
+    public List<ScheduleResponse> getAllScheduleByClass(Long classId){
+        List<Schedule> schedules = scheduleRepository.findByClassRoomId(classId);
+
+        return scheduleMapper.toScheduleResponseList(schedules);
+
     }
 
     public void deleteSchedule(String id){

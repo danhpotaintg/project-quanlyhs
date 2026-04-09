@@ -52,6 +52,13 @@ public class ScheduleController {
                 .build();
     }
 
+    @GetMapping("/{classId}")
+    ApiResponse<List<ScheduleResponse>> getAllScheduleByClass(@PathVariable Long classId) {
+        return ApiResponse.<List<ScheduleResponse>>builder()
+                .result(scheduleService.getAllScheduleByClass(classId))
+                .build();
+    }
+
     @DeleteMapping("/{id}")
     ApiResponse<String> deledeSche(@PathVariable String id) {
         scheduleService.deleteSchedule(id);
