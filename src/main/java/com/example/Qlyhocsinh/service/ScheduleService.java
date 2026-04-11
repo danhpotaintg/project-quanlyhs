@@ -41,6 +41,10 @@ public class ScheduleService {
         Teacher teacher = teacherRepository.findById(request.getTeacherId())
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
+        if (request.getStartLesson() > request.getEndLesson()) {
+            throw new AppException(ErrorCode.INVALID_LESSON_RANGE);
+        }
+
         if(!teacher.getSubject().getId().equals(subject.getId()))
             throw new AppException(ErrorCode.TEACHER_DOESNT_HAVE_SUBJECT);
 

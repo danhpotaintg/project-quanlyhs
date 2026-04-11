@@ -42,13 +42,6 @@ public class Grade {
     @Column(name = "teacher_id", nullable = false)
     private String teacherId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = true, length = 20)
-    private GradeStatus status;
-
-    @Column(columnDefinition = "TEXT")
-    private String note;
-
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
