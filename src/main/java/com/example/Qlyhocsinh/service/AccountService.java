@@ -7,15 +7,15 @@ import org.springframework.stereotype.Service;
 public class AccountService {
 
     public String generateUsername(String fullName, String customId) {
-        // "Nguyễn Văn Anh" -> "anv"
+        //viet tat ten
         String abbreviation = StringUtils.getAbbreviatedName(fullName);
 
-        // Ghép lại theo mẫu: anv_K22ST00001
+        // gheo theo mau
         return abbreviation + "_" + customId;
     }
 
     public String generateDefaultPassword(String customId) {
-        // Mật khẩu mặc định chính là ID (K22ST00001)
+        //mk mac dinh la id
         return customId;
     }
 }
