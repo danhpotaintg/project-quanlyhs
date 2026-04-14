@@ -39,9 +39,16 @@ public class ScheduleController {
     }
 
     @GetMapping("/teacher")
-    ApiResponse<List<ScheduleResponse>> getAllScheduleByTeacherID() {
+    ApiResponse<List<ScheduleResponse>> getAllScheduleByTeacher() {
         return ApiResponse.<List<ScheduleResponse>>builder()
                 .result(scheduleService.getAllScheduleByTeacher())
+                .build();
+    }
+
+    @GetMapping("/teacher/{teacherId}")
+    ApiResponse<List<ScheduleResponse>> getAllScheduleByTeacherId(@PathVariable String teacherId) {
+        return ApiResponse.<List<ScheduleResponse>>builder()
+                .result(scheduleService.getAllScheduleByTeacherID(teacherId))
                 .build();
     }
 
@@ -52,7 +59,7 @@ public class ScheduleController {
                 .build();
     }
 
-    @GetMapping("/{classId}")
+    @GetMapping("/class/{classId}")
     ApiResponse<List<ScheduleResponse>> getAllScheduleByClass(@PathVariable Long classId) {
         return ApiResponse.<List<ScheduleResponse>>builder()
                 .result(scheduleService.getAllScheduleByClass(classId))

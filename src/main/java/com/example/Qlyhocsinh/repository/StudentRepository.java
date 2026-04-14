@@ -14,8 +14,9 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     Optional<Student> findByUserUsername(String name);
     Optional<Student> findByUserIdAndClassRoomId(String id, Long classId);
 
-    @Query("SELECT s FROM Student s WHERE s.classRoom IS NULL")
+    @Query("SELECT s FROM Student s WHERE s.classRoom IS NULL AND s.user.isActive = true")
     List<Student> findAllWithoutClass();
 
-    List<Student> findAllByUserIdIn(List<String> studentIds);
+    @Query("SELECT s FROM Student s WHERE s.classRoom.id = :classId AND s.user.isActive = true")
+    List<Student> findAllActiveByClass(Long classId);
 }

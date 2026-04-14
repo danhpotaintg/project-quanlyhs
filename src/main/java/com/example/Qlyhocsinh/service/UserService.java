@@ -4,12 +4,18 @@ import com.example.Qlyhocsinh.dto.request.UserCreationRequest;
 import com.example.Qlyhocsinh.dto.request.UserUpdateByIDRequest;
 import com.example.Qlyhocsinh.dto.request.UserUpdateRequest;
 import com.example.Qlyhocsinh.dto.response.UserResponse;
+import com.example.Qlyhocsinh.entity.Student;
+import com.example.Qlyhocsinh.entity.Teacher;
 import com.example.Qlyhocsinh.entity.User;
 import com.example.Qlyhocsinh.enums.Role;
 import com.example.Qlyhocsinh.exception.AppException;
 import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.UserMapper;
+import com.example.Qlyhocsinh.repository.ClassRepository;
+import com.example.Qlyhocsinh.repository.StudentRepository;
+import com.example.Qlyhocsinh.repository.TeacherRepository;
 import com.example.Qlyhocsinh.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,6 +40,9 @@ import java.util.Optional;
 public class    UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    TeacherRepository teacherRepository;
+    ClassRepository classRepository;
+    StudentRepository studentRepository;
 
     PasswordEncoder passwordEncoder;
 
@@ -53,7 +62,7 @@ public class    UserService {
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers(){
         log.info("O trong method getUsers");
-        return userRepository.findAll().stream()
+        return userRepository.findAllByIsActiveTrue().stream()
                 .map(userMapper::toUserResponse).toList();
     }
 
@@ -92,9 +101,32 @@ public class    UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteUser(String userId){
-        userRepository.deleteById(userId);
+    public void deleteUser(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (user.getRole().equals("TEACHER")) {
+            Teacher teacher = teacherRepository.findById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+
+            classRepository.findByTeacherUserId(userId).ifPresent(classRoom -> {
+                classRoom.setTeacher(null);
+                classRepository.save(classRoom);
+            });
+
+
+        } else if (user.getRole().equals("STUDENT")) {
+            Student student = studentRepository.findById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+            student.setClassRoom(null);
+            studentRepository.save(student);
+        }
+
+        user.setActive(false);
+        userRepository.save(user);
     }
 
 
@@ -110,9 +142,13 @@ public class    UserService {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
         log.info("o trong getMyInfo");
-         User user = userRepository.findByUsername(name)
+        User user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-         return userMapper.toUserResponse(user);
+        if (!user.isActive()) {
+            throw new AppException(ErrorCode.USER_DISABLED);
+        }
+
+        return userMapper.toUserResponse(user);
     }
 }

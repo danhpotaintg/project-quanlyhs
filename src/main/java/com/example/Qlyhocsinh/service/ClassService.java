@@ -109,7 +109,7 @@ public class ClassService {
     }
 
     public List<StudentResponse> getStuInClass(Long id){
-        return studentMapper.toStudentResponseList(studentRepository.findByClassRoomId(id));
+        return studentMapper.toStudentResponseList(studentRepository.findAllActiveByClass(id));
     }
 
     public List<StudentResponse> getMyStudents(){
@@ -123,7 +123,7 @@ public class ClassService {
             throw new AppException(ErrorCode.CLASS_NOT_FOUND);
         }
 
-        return studentMapper.toStudentResponseList(studentRepository.findByClassRoomId(teacher.getClassRoom().getId()));
+        return studentMapper.toStudentResponseList(studentRepository.findAllActiveByClass(teacher.getClassRoom().getId()));
     }
 
     public void removeStudentFromClass(String studentId, Long classId){

@@ -12,6 +12,7 @@ import com.example.Qlyhocsinh.mapper.StudentMapper;
 import com.example.Qlyhocsinh.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -133,6 +134,17 @@ public class ScheduleService {
 
     public List<ScheduleResponse> getAllScheduleByClass(Long classId){
         List<Schedule> schedules = scheduleRepository.findByClassRoomId(classId);
+
+        return scheduleMapper.toScheduleResponseList(schedules);
+
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ScheduleResponse> getAllScheduleByTeacherID(String teacherId){
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+
+        List<Schedule> schedules = scheduleRepository.findByTeacherId(teacher.getId());
 
         return scheduleMapper.toScheduleResponseList(schedules);
 

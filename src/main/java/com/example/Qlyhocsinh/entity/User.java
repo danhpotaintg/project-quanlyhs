@@ -33,7 +33,8 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Teacher teacher;
 
-
+    @Column(name = "is_active", columnDefinition = "boolean default true")
+    boolean isActive = true;
 
 }
 

@@ -38,6 +38,7 @@ public enum ErrorCode {
     FILE_READ_ERROR(1019, "Lỗi đọc file. Vui lòng đảm bảo file đúng định dạng Excel (.xlsx)", HttpStatus.BAD_REQUEST),
     INVALID_LESSON_RANGE(2108, "Tiết học không hợp lệ", HttpStatus.BAD_REQUEST),
     LEAVE_REQUEST_NOT_FOUND(2109, "Không tìm thấy đơn xin nghỉ", HttpStatus.BAD_REQUEST),
+    USER_DISABLED(2110, "Tài khoản bị vô hiệu hoá", HttpStatus.BAD_REQUEST),
     ;
 
 

@@ -73,7 +73,7 @@ public class TeacherService {
     }
 
     public List<TeacherResponse> getAll(){
-        var tea = teacherRepository.findAll();
+        var tea = teacherRepository.findAllActiveTeacher();
         return tea.stream().map(teacherMapper::toTeacherResponse).toList();
     }
 
