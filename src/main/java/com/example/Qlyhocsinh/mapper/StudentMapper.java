@@ -16,7 +16,6 @@ public interface StudentMapper {
 
 
     @Mapping(source = "user.id", target = "id")
-    //@Mapping(source = "user", target = "user")
     StudentResponse toStudentResponse(Student student);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
