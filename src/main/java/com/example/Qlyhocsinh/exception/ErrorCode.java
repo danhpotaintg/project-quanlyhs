@@ -36,6 +36,8 @@ public enum ErrorCode {
     TEACHER_DOESNT_HAVE_SUBJECT(1021, "Giáo viên không dạy môn này", HttpStatus.BAD_REQUEST),
     FILE_EMPTY(1018, "File tải lên không có dữ liệu",HttpStatus.BAD_REQUEST),
     FILE_READ_ERROR(1019, "Lỗi đọc file. Vui lòng đảm bảo file đúng định dạng Excel (.xlsx)", HttpStatus.BAD_REQUEST),
+    TEACHER_NOT_HOMEROOM(1020,"Giao vien khong chu nhiem lop nao",HttpStatus.BAD_REQUEST),
+    EMPTY_STUDENT_LIST(1021,"Vui long chon it nhat 1 hoc sinh",HttpStatus.BAD_REQUEST),
     INVALID_LESSON_RANGE(2108, "Tiết học không hợp lệ", HttpStatus.BAD_REQUEST),
     LEAVE_REQUEST_NOT_FOUND(2109, "Không tìm thấy đơn xin nghỉ", HttpStatus.BAD_REQUEST),
     ;
