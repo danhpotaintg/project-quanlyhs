@@ -29,5 +29,7 @@ spring:
             enable: true
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+aes:
+  signerKey: "PtitSecretKey123"
 upload:
   path: ./user-photos/
