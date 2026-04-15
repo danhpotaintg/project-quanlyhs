@@ -5,9 +5,7 @@ import com.example.Qlyhocsinh.dto.request.SendNotificationRequest;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
 import com.example.Qlyhocsinh.service.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +32,7 @@ public class NotificationController {
     @PostMapping("/send")
     public ApiResponse<String> sendNotification(@RequestBody SendNotificationRequest request) {
 
-        notificationService.sendEmailToParents(request);
+        notificationService.sendEmailToUser(request);
 
         return ApiResponse.<String>builder()
                 .result("SUCCESS")
