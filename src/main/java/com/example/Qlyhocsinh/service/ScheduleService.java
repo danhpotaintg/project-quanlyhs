@@ -1,6 +1,7 @@
 package com.example.Qlyhocsinh.service;
 
 import com.example.Qlyhocsinh.dto.request.ScheduleRequest;
+import com.example.Qlyhocsinh.dto.request.TeacherStatisticRequest;
 import com.example.Qlyhocsinh.dto.response.ClassResponse;
 import com.example.Qlyhocsinh.dto.response.ScheduleResponse;
 import com.example.Qlyhocsinh.entity.*;
@@ -115,6 +116,12 @@ public class ScheduleService {
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
         List<Schedule> schedules = scheduleRepository.findByTeacherId(teacher.getId());
+
+        return scheduleMapper.toScheduleResponseList(schedules);
+    }
+    public List<ScheduleResponse> getAllScheduleByTeacher(String teacherId, TeacherStatisticRequest request){
+
+        List<Schedule> schedules = scheduleRepository.findByTeacherIdAndSemesterAndAcademicYear(teacherId, request.getSemester(),request.getAcademicYear());
 
         return scheduleMapper.toScheduleResponseList(schedules);
     }
