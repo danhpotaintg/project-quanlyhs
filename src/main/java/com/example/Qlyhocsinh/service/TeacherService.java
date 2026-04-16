@@ -39,6 +39,7 @@ public class TeacherService {
     private final PasswordEncoder passwordEncoder;
     private final AccountService accountService;
     private final IdGeneratorService idGeneratorService;
+    private final NotificationService notificationService;
 
     @PreAuthorize("hasRole('ADMIN')")
     public TeacherResponse createTeacher(TeacherCreationRequest request){
@@ -62,6 +63,7 @@ public class TeacherService {
         teacher.setSubject(subject);
 
         teacherRepository.save(teacher);
+        notificationService.sendNewAccountToUser(username,teacherId,teacher.getEmail(),teacher.getFullName());
         return teacherMapper.toTeacherResponse(teacher);
     }
 

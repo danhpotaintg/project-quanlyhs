@@ -16,6 +16,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, String> {
     List<ClassRoom> findDistinctClassByTeacherId(@Param("teacherId") String teacherId);
 
     List<Schedule> findByTeacherId(String teacherId);
+    List<Schedule> findByTeacherIdAndSemesterAndAcademicYear(String teacherId, int semester, int academicYear);
 
     List<Schedule> findByClassRoomId(Long classId);
 

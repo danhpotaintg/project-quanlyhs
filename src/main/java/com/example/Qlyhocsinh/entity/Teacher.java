@@ -32,6 +32,7 @@ public class Teacher {
     private String email;
     private String phoneNumber;
 
+
     @OneToOne(mappedBy = "teacher")
     private ClassRoom classRoom;
 

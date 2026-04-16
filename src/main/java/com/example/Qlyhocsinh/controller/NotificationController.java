@@ -5,9 +5,7 @@ import com.example.Qlyhocsinh.dto.request.SendNotificationRequest;
 import com.example.Qlyhocsinh.dto.response.StudentResponse;
 import com.example.Qlyhocsinh.service.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +22,6 @@ public class NotificationController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         List<StudentResponse> students = notificationService.getStudentsOfHomeroomTeacher(username);
 
-        // Trả về theo cấu trúc ApiResponse chuẩn của bạn (code mặc định đã là 1000)
         return ApiResponse.<List<StudentResponse>>builder()
                 .result(students)
                 .message("Lấy danh sách thành công")
@@ -34,7 +31,8 @@ public class NotificationController {
     // Nhận request gửi mail
     @PostMapping("/send")
     public ApiResponse<String> sendNotification(@RequestBody SendNotificationRequest request) {
-        notificationService.sendEmailToParents(request);
+
+        notificationService.sendEmailToUser(request);
 
         return ApiResponse.<String>builder()
                 .result("SUCCESS")

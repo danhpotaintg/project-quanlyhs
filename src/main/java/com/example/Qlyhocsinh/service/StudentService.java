@@ -35,6 +35,7 @@ public class StudentService {
     private final AccountService accountService;
     private final IdGeneratorService idGeneratorService;
     private final ClassRepository classRepository;
+    private final NotificationService notificationService;
 
     @PreAuthorize("hasRole('ADMIN')")
     public StudentResponse createStudent(StudentCreationRequest request) {
@@ -57,8 +58,10 @@ public class StudentService {
         Student student = studentMapper.toStudent(request);
         student.setUser(user);
         student.setClassRoom(classRoom);
-
         studentRepository.save(student);
+
+        notificationService.sendNewAccountToUser(username,studentId,student.getParentGmail(),student.getFullName());
+
         return studentMapper.toStudentResponse(student);
     }
 
