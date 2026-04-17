@@ -59,7 +59,7 @@ public class WebNotificationService {
         TeacherNotification notif = notificationMapper.toTeacherNotification(request);
 
         notif.setClassId(classId);
-        notif.setSenderUsername(username);
+        notif.setSenderUsername(teacher.getFullName());
         notif.setCreatedAt(LocalDateTime.now());
 
         notificationRepository.save(notif);
@@ -81,8 +81,10 @@ public class WebNotificationService {
     }
 
     @PreAuthorize("hasRole('TEACHER')")
-    public List<NotificationResponse> getNotificationsForTeacher() {
-        List<Notification> notifications = notificationRepository.findForTeacher();
+    public List<NotificationResponse> getNotificationsForTeacher(String teacherUsername) {
+        Teacher teacher = teacherRepository.findByUserUsername(teacherUsername)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+        List<Notification> notifications = notificationRepository.findForTeacher(teacher.getId());
 
         return notifications.stream()
                 .map(notificationMapper::toNotificationResponse)

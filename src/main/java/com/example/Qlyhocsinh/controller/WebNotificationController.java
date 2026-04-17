@@ -34,7 +34,7 @@ public class WebNotificationController {
 
         return ApiResponse.<String>builder()
                 .result("SUCCESS")
-                .message("Đã gửi thông báo chung!")
+                .message("Đã gửi thông báo!")
                 .build();
     }
 
@@ -53,12 +53,13 @@ public class WebNotificationController {
     @GetMapping("/my-notifications")
     ApiResponse<List<NotificationResponse>> getMyNotifications() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
+
         boolean isStudent = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_STUDENT"));
 
         List<NotificationResponse> notifications = isStudent
                 ? webNotificationService.getNotificationsForStudent(authentication.getName())
-                : webNotificationService.getNotificationsForTeacher();
+                : webNotificationService.getNotificationsForTeacher(authentication.getName());
 
         return ApiResponse.<List<NotificationResponse>>builder()
                 .result(notifications)

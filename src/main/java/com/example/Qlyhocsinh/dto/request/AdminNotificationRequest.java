@@ -13,5 +13,6 @@ public class AdminNotificationRequest {
     String content;
     boolean toStudents;
     boolean toTeachers;
-
+    Long targetClassId;
+    String targetTeacherId;
 }

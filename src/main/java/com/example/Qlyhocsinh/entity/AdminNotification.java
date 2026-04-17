@@ -16,4 +16,7 @@ import lombok.NoArgsConstructor;
 public class AdminNotification extends Notification{
     boolean toStudents;
     boolean toTeachers;
+
+    Long targetClassId;
+    String targetTeacherId;
 }
