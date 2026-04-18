@@ -30,6 +30,7 @@ public class ClassGradeSheetResponse {
         private String studentId;
         private String studentName;
         private Map<String, Double> scores;
+        private Double semesterAverage; // diem trung binh
     }
 
 }

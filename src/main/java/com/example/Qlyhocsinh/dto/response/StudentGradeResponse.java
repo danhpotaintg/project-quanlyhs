@@ -11,6 +11,7 @@ public class StudentGradeResponse {
     private String subjectId;
     private String subjectName;
     private Integer semester;
+    private Double semesterAverage; // diem tb ki
     private List<GradeConfigDetail> gradeConfigs;
 
     @Data

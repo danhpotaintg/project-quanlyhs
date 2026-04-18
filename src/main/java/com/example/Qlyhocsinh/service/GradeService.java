@@ -66,30 +66,55 @@ public class GradeService {
     @Transactional
     public List<GradeResponse> saveBatch(String studentId, List<GradeBatchRequest.GradeEntry> entries, String teacherId){
 
-        List<GradeResponse> result = new ArrayList<>();
+        List<Long> configIds = entries.stream()
+                .map(GradeBatchRequest.GradeEntry::getGradeConfigId)
+                .distinct()
+                .toList();
 
-        for(GradeBatchRequest.GradeEntry entry : entries ){
+        //Lấy GradeConfig 1 lần
+        Map<Long, GradeConfig> configMap = gradeConfigRepository.findAllById(configIds)
+                .stream()
+                .collect(Collectors.toMap(GradeConfig::getId, gc -> gc));
 
-            GradeConfig gradeConfig = gradeConfigRepository.findById(entry.getGradeConfigId())
-                    .orElseThrow(()-> new AppException(ErrorCode.GRADE_CONFIG_NOT_FOUND));
+        //Lấy toàn bộ Grade hiện có của student
+        List<Grade> existingGrades = gradeRepository.findByStudentIdAndGradeConfigIdIn(studentId, configIds);
+
+        // Map key = (configId + entryIndex)
+        Map<String, Grade> gradeMap = existingGrades.stream()
+                .collect(Collectors.toMap(
+                        g -> g.getGradeConfigId() + "_" + g.getEntryIndex(),
+                        g -> g
+                ));
+
+        List<Grade> toSave = new ArrayList<>();
+
+        for (GradeBatchRequest.GradeEntry entry : entries) {
+
+            GradeConfig gradeConfig = configMap.get(entry.getGradeConfigId());
+            if (gradeConfig == null) {
+                throw new AppException(ErrorCode.GRADE_CONFIG_NOT_FOUND);
+            }
 
             validateEntryIndex(entry.getEntryIndex(), gradeConfig.getMaxEntries());
 
-            Grade grade = gradeRepository.findByStudentIdAndGradeConfigIdAndEntryIndex(studentId, gradeConfig.getId(), entry.getEntryIndex())
-                    .orElseGet(() -> Grade.builder()
+            String key = entry.getGradeConfigId() + "_" + entry.getEntryIndex();
+
+            Grade grade = gradeMap.getOrDefault(key,
+                    Grade.builder()
                             .studentId(studentId)
                             .teacherId(teacherId)
-                            .gradeConfigId(gradeConfig.getId())
+                            .gradeConfigId(entry.getGradeConfigId())
                             .entryIndex(entry.getEntryIndex())
-                            .build());
+                            .build()
+            );
 
             grade.setScore(entry.getScore());
-
-            GradeResponse gradeResponse = gradeMapper.toResponse(gradeRepository.save(grade));
-
-            result.add(gradeResponse);
+            toSave.add(grade);
         }
-        return result;
+
+        return gradeRepository.saveAll(toSave).stream()
+                .map(gradeMapper::toResponse)
+                .toList();
     }
 
     // lấy điểm học sinh 1 lớp theo môn và kì học
@@ -99,61 +124,44 @@ public class GradeService {
 
         List<GradeRawRow> rawRows = gradeRepository.findGradeSheet(classId, subjectId, semester);
 
-        if (rawRows.isEmpty()) {
-            throw new AppException(ErrorCode.STUDENT_NOT_FOUND);
-        }
+        if (rawRows.isEmpty()) throw new AppException(ErrorCode.STUDENT_NOT_FOUND);
 
-        // 2. Build danh sách GradeConfig (không trùng)
-
+        // Build gradeConfigs
         Map<Long, ClassGradeSheetResponse.GradeConfigDto> configMap = new LinkedHashMap<>();
-
         for (GradeRawRow row : rawRows) {
             Long configId = row.getGradeConfigId();
-
             if (!configMap.containsKey(configId)) {
-                ClassGradeSheetResponse.GradeConfigDto dto =
-                        ClassGradeSheetResponse.GradeConfigDto.builder()
-                                .id(row.getGradeConfigId())
-                                .scoreType(row.getGradeConfigName())
-                                .maxEntries(row.getMaxEntries())
-                                .weight(row.getWeight())
-                                .subjectId(subjectId)
-                                .semester(row.getSemester())
-                                .build();
-
-                configMap.put(configId, dto);
+                configMap.put(configId, ClassGradeSheetResponse.GradeConfigDto.builder()
+                        .id(row.getGradeConfigId())
+                        .scoreType(row.getGradeConfigName())
+                        .maxEntries(row.getMaxEntries())
+                        .weight(row.getWeight())
+                        .subjectId(subjectId)
+                        .semester(row.getSemester())
+                        .build());
             }
         }
+        List<ClassGradeSheetResponse.GradeConfigDto> configDtos = new ArrayList<>(configMap.values());
 
-        List<ClassGradeSheetResponse.GradeConfigDto> configDtos =
-                new ArrayList<>(configMap.values());
-
-        // 3. Group dữ liệu theo student
-
+        // Group theo student
         Map<String, List<GradeRawRow>> groupedByStudent = new LinkedHashMap<>();
-
         for (GradeRawRow row : rawRows) {
             String studentId = row.getStudentId();
-
             if (!groupedByStudent.containsKey(studentId)) {
                 groupedByStudent.put(studentId, new ArrayList<>());
             }
-
             groupedByStudent.get(studentId).add(row);
         }
 
-        // 4. Build danh sách student rows
-
+        // Build student rows
         List<ClassGradeSheetResponse.StudentGradeRow> studentRows = new ArrayList<>();
 
         for (Map.Entry<String, List<GradeRawRow>> entry : groupedByStudent.entrySet()) {
-
             String studentId = entry.getKey();
             List<GradeRawRow> studentData = entry.getValue();
 
-            // Map điểm: key = configId_entryIndex
+            // Build scores map
             Map<String, Double> scores = new HashMap<>();
-
             for (GradeRawRow row : studentData) {
                 if (row.getScore() != null) {
                     String key = row.getGradeConfigId() + "_" + row.getEntryIndex();
@@ -161,14 +169,53 @@ public class GradeService {
                 }
             }
 
-            ClassGradeSheetResponse.StudentGradeRow studentRow =
-                    ClassGradeSheetResponse.StudentGradeRow.builder()
-                            .studentId(studentId)
-                            .studentName(studentData.get(0).getStudentName())
-                            .scores(scores)
-                            .build();
+            // Tính TB kì - group theo scoreType
+            Map<String, List<GradeRawRow>> groupedByType = new LinkedHashMap<>();
+            for (GradeRawRow row : studentData) {
+                String scoreType = row.getGradeConfigName();
+                if (!groupedByType.containsKey(scoreType)) {
+                    groupedByType.put(scoreType, new ArrayList<>());
+                }
+                groupedByType.get(scoreType).add(row);
+            }
 
-            studentRows.add(studentRow);
+            double totalWeightedScore = 0;
+            double totalWeight = 0;
+            boolean canCalculate = true;
+
+            for (Map.Entry<String, List<GradeRawRow>> typeEntry : groupedByType.entrySet()) {
+                List<GradeRawRow> typeRows = typeEntry.getValue();
+
+                List<Double> validScores = new ArrayList<>();
+                for (GradeRawRow row : typeRows) {
+                    if (row.getScore() != null) validScores.add(row.getScore());
+                }
+
+                if (validScores.isEmpty()) {
+                    canCalculate = false;
+                    break;
+                }
+
+                double avg = 0;
+                for (Double s : validScores) avg += s;
+                avg = avg / validScores.size();
+
+                double weight = typeRows.get(0).getWeight();
+                totalWeightedScore += avg * weight;
+                totalWeight += weight;
+            }
+
+            Double semesterAverage = null;
+            if (canCalculate && totalWeight > 0) {
+                semesterAverage = Math.round((totalWeightedScore / totalWeight) * 100.0) / 100.0;
+            }
+
+            studentRows.add(ClassGradeSheetResponse.StudentGradeRow.builder()
+                    .studentId(studentId)
+                    .studentName(studentData.get(0).getStudentName())
+                    .scores(scores)
+                    .semesterAverage(semesterAverage)
+                    .build());
         }
 
         return ClassGradeSheetResponse.builder()
@@ -178,22 +225,20 @@ public class GradeService {
     }
 
     @PreAuthorize("hasRole('STUDENT')")
-    @Transactional
-    public StudentGradeResponse getGradesBySubject(String studentId, String subjectId, Integer semester){
+    public StudentGradeResponse getGradesBySubject(String studentId, String subjectId, Integer semester) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+
         List<GradeRawRow> grades = gradeRepository.findStudentGradeBySubject(studentId, subjectId, semester);
 
-        if(grades.isEmpty()) throw new AppException(ErrorCode.GRADE_CONFIG_NOT_FOUND);
+        if (grades.isEmpty()) throw new AppException(ErrorCode.GRADE_CONFIG_NOT_FOUND);
 
         Map<Long, List<GradeRawRow>> grouped = new LinkedHashMap<>();
-
-        for (GradeRawRow row : grades){
+        for (GradeRawRow row : grades) {
             Long configId = row.getGradeConfigId();
-
             if (!grouped.containsKey(configId)) {
                 grouped.put(configId, new ArrayList<>());
             }
@@ -202,39 +247,60 @@ public class GradeService {
 
         List<StudentGradeResponse.GradeConfigDetail> gradeConfigs = new ArrayList<>();
 
-        for (Map.Entry<Long, List<GradeRawRow>> entry : grouped.entrySet()) {
+        double totalWeightedScore = 0;
+        double totalWeight = 0;
+        boolean canCalculate = true;
 
+        for (Map.Entry<Long, List<GradeRawRow>> entry : grouped.entrySet()) {
             Long gradeConfigId = entry.getKey();
             List<GradeRawRow> rows = entry.getValue();
 
-            // Sắp xếp theo entryIndex (lần nhập điểm)
             rows.sort(Comparator.comparing(GradeRawRow::getEntryIndex));
 
-            // Lấy danh sách điểm
             List<Double> scores = new ArrayList<>();
             for (GradeRawRow row : rows) {
-                scores.add(row.getScore()); // có thể null
+                scores.add(row.getScore());
             }
 
-            // Lấy thông tin config từ row đầu tiên
             GradeRawRow firstRow = rows.get(0);
 
-            StudentGradeResponse.GradeConfigDetail detail =
-                    StudentGradeResponse.GradeConfigDetail.builder()
-                            .gradeConfigId(gradeConfigId)
-                            .scoreType(firstRow.getGradeConfigName())
-                            .weight(firstRow.getWeight())
-                            .maxEntries(firstRow.getMaxEntries())
-                            .scores(scores)
-                            .build();
+            gradeConfigs.add(StudentGradeResponse.GradeConfigDetail.builder()
+                    .gradeConfigId(gradeConfigId)
+                    .scoreType(firstRow.getGradeConfigName())
+                    .weight(firstRow.getWeight())
+                    .maxEntries(firstRow.getMaxEntries())
+                    .scores(scores)
+                    .build());
 
-            gradeConfigs.add(detail);
+            // Tính TB theo từng scoreType
+            List<Double> validScores = new ArrayList<>();
+            for (Double s : scores) {
+                if (s != null) validScores.add(s);
+            }
+
+            if (validScores.isEmpty()) {
+                // Còn thiếu điểm → không tính được TB
+                canCalculate = false;
+            } else {
+                double avg = 0;
+                for (Double s : validScores) avg += s;
+                avg = avg / validScores.size();
+
+                totalWeightedScore += avg * firstRow.getWeight();
+                totalWeight += firstRow.getWeight();
+            }
+        }
+
+        Double semesterAverage = null;
+        if (canCalculate && totalWeight > 0) {
+            semesterAverage = Math.round((totalWeightedScore / totalWeight) * 100.0) / 100.0;
         }
 
         return StudentGradeResponse.builder()
                 .subjectId(subjectId)
                 .subjectName(subject.getSubjectName())
                 .semester(semester)
+                .semesterAverage(semesterAverage)
                 .gradeConfigs(gradeConfigs)
                 .build();
     }
