@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class GradeRequest {
-
 //    @NotBlank(message = "student_id không được để trống")
 //    private String studentId;
 //
@@ -37,4 +36,5 @@ public class GradeRequest {
 //    @Size(max = 500, message = "Ghi chú không quá 500 ký tự")
 //    private String note;
 //
+
 }
