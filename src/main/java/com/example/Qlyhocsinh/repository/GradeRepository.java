@@ -86,6 +86,8 @@ public interface GradeRepository extends JpaRepository<Grade, Long> {
 
     Optional<Grade> findByStudentIdAndGradeConfigIdAndEntryIndex(String studentId, Long gradeConfigId, Integer entryIndex);
 
+    List<Grade> findByStudentIdAndGradeConfigIdIn(String studentId, List<Long> gradeConfigIds);
+
     List<Grade> findByStudentIdInAndGradeConfigIdIn(
             List<String> studentIds, List<Long> gradeConfigIds
     );
