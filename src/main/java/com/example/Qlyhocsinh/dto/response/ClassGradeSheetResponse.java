@@ -12,6 +12,8 @@ public class ClassGradeSheetResponse {
 
     private List<GradeConfigDto> gradeConfigs;
     private List<StudentGradeRow> students;
+    private int academicYear;
+    private Integer semester;
 
     @Data
     @Builder

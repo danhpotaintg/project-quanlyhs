@@ -11,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 public class GradeConfigRequest {
 
     Integer semester;
+    int academicYear;
     String scoreType;
     Double weight;
     Integer maxEntries;

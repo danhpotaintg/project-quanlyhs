@@ -10,4 +10,7 @@ import java.util.List;
 public interface GradeConfigRepository extends JpaRepository<GradeConfig, Long> {
 
     List<GradeConfig> findBySubjectId(String subjectId);
+
+    List<GradeConfig> findBySubjectIdAndAcademicYearAndSemester(String subjectId, int academicYear, Integer semester);
+
 }

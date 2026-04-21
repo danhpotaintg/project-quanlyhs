@@ -75,13 +75,13 @@ public class GradeConfigService {
         // Kiểm tra trùng trong DB
         List<GradeConfig> existing = gradeConfigRepository.findBySubjectId(subjectId);
         Set<String> existingKeys = existing.stream()
-                .map(gc -> gc.getSemester() + "_" + gc.getScoreType())
+                .map(gc -> gc.getSemester() + "_" + gc.getScoreType() + "_" + gc.getAcademicYear())
                 .collect(Collectors.toSet());
 
         // Kiểm tra trùng trong chính request (ví dụ gửi 2 thuong_xuyen kỳ 1)
         Set<String> requestKeys = new HashSet<>();
         List<String> duplicatesInRequest = bulkRequest.getConfigs().stream()
-                .map(r -> r.getSemester() + "_" + r.getScoreType())
+                .map(r -> r.getSemester() + "_" + r.getScoreType() + "_" + r.getAcademicYear())
                 .filter(key -> !requestKeys.add(key))
                 .toList();
 
@@ -91,7 +91,7 @@ public class GradeConfigService {
 
         // Kiểm tra trùng với DB
         List<String> duplicatesWithDb = bulkRequest.getConfigs().stream()
-                .map(r -> r.getSemester() + "_" + r.getScoreType())
+                .map(r -> r.getSemester() + "_" + r.getScoreType() + "_" + r.getAcademicYear())
                 .filter(existingKeys::contains)
                 .toList();
 
@@ -130,4 +130,16 @@ public class GradeConfigService {
                 .build();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public GradeConfigBulkResponse getGradeConfigBySubjectIdAndAcademicYearAndSemester(String subjectId, int academicYear, Integer semester){
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(()-> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+        List<GradeConfig> configs = gradeConfigRepository.findBySubjectIdAndAcademicYearAndSemester(subjectId, academicYear, semester);
+
+        return GradeConfigBulkResponse.builder()
+                .subjectId(subjectId)
+                .subjectName(subject.getSubjectName())
+                .configs(configs.stream().map(gradeConfigMapper::toGradeConfigResponse).toList())
+                .build();
+    }
 }
