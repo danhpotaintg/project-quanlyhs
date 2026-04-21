@@ -117,12 +117,12 @@ public class GradeService {
                 .toList();
     }
 
-    // lấy điểm học sinh 1 lớp theo môn và kì học
-    @PreAuthorize("hasRole('TEACHER')")
+    // lấy điểm học sinh 1 lớp theo môn, năm học và kì học
+    //@PreAuthorize("hasRole('TEACHER')")
     public ClassGradeSheetResponse getGradeSheet(Long classId, String subjectId,
-                                                 Integer semester, String teacherId) {
+                                                 Integer semester, int academicYear) {
 
-        List<GradeRawRow> rawRows = gradeRepository.findGradeSheet(classId, subjectId, semester);
+        List<GradeRawRow> rawRows = gradeRepository.findGradeSheet(classId, subjectId, semester, academicYear);
 
         if (rawRows.isEmpty()) throw new AppException(ErrorCode.STUDENT_NOT_FOUND);
 
@@ -220,19 +220,22 @@ public class GradeService {
 
         return ClassGradeSheetResponse.builder()
                 .gradeConfigs(configDtos)
+                .semester(semester)
+                .academicYear(academicYear)
                 .students(studentRows)
                 .build();
     }
 
+    //học sinh xem điểm môn học của mình theo môn, năm học và học kì
     @PreAuthorize("hasRole('STUDENT')")
-    public StudentGradeResponse getGradesBySubject(String studentId, String subjectId, Integer semester) {
+    public StudentGradeResponse getGradesBySubject(String studentId, String subjectId, Integer semester, int academicYear) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
 
-        List<GradeRawRow> grades = gradeRepository.findStudentGradeBySubject(studentId, subjectId, semester);
+        List<GradeRawRow> grades = gradeRepository.findStudentGradeBySubject(studentId, subjectId, semester, academicYear);
 
         if (grades.isEmpty()) throw new AppException(ErrorCode.GRADE_CONFIG_NOT_FOUND);
 
@@ -300,6 +303,7 @@ public class GradeService {
                 .subjectId(subjectId)
                 .subjectName(subject.getSubjectName())
                 .semester(semester)
+                .academicYear(academicYear)
                 .semesterAverage(semesterAverage)
                 .gradeConfigs(gradeConfigs)
                 .build();

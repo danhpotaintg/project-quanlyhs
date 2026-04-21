@@ -12,13 +12,13 @@ public class ClassGradeSheetResponse {
 
 
     private String className;
-    private Integer academicYear;
     private String subjectName;
     private String teacherName;
-    private Integer semester;
 
     private List<GradeConfigDto> gradeConfigs;
     private List<StudentGradeRow> students;
+    private int academicYear;
+    private Integer semester;
 
     @Data
     @Builder

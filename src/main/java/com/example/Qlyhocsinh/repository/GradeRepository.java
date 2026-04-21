@@ -13,11 +13,6 @@ import java.util.Optional;
 @Repository
 public interface GradeRepository extends JpaRepository<Grade, Long> {
 
-    // Kiểm tra trùng (student + loại điểm + lần nhập)
-    boolean existsByStudentIdAndGradeConfigIdAndEntryIndex(String studentId, Long gradeConfigId, Integer entryIndex);
-
-    // Đếm số lần nhập điểm của 1 học sinh trong 1 gradeConfig
-    long countByStudentIdAndGradeConfigId(String studentId, Long gradeConfigId);
 
     @Query(value = """
     SELECT s.student_id AS studentId,
@@ -27,6 +22,7 @@ public interface GradeRepository extends JpaRepository<Grade, Long> {
            gc.max_entries     AS maxEntries,
            gc.weight          AS weight,
            gc.semester        AS semester,
+           gc.academic_year   AS academicYear,
            gc.subject_id      AS subjectId,
            gen.entry_index    AS entryIndex,
            g.score            AS score
@@ -46,50 +42,51 @@ public interface GradeRepository extends JpaRepository<Grade, Long> {
     WHERE s.class_id = :classId
         AND gc.subject_id = :subjectId
         AND gc.semester = :semester
+        AND gc.academic_year = :academicYear
     ORDER BY s.full_name, gc.semester, gc.score_type, gen.entry_index
 """, nativeQuery = true)
     List<GradeRawRow> findGradeSheet(
             @Param("classId") Long classId,
             @Param("subjectId") String subjectId,
-            @Param("semester") Integer semester
+            @Param("semester") Integer semester,
+            @Param("academicYear") int academicYear
     );
 
     @Query(value = """
-        SELECT gc.grade_config_id AS gradeConfigId,
-               gc.score_type      AS gradeConfigName,
-               gc.weight          AS weight,
-               gc.max_entries     AS maxEntries,
-               gc.subject_id      AS subjectId,
-               gc.semester        AS semester,
-               gen.entry_index    AS entryIndex,
-               g.score            AS score
-        FROM grade_config gc
-        JOIN (
-            SELECT 1 AS entry_index UNION ALL
-            SELECT 2 UNION ALL
-            SELECT 3 UNION ALL
-            SELECT 4 UNION ALL
-            SELECT 5
-        ) gen ON gen.entry_index <= gc.max_entries
-        LEFT JOIN grades g ON g.grade_config_id = gc.grade_config_id
-            AND g.student_id = :studentId
-            AND g.entry_index = gen.entry_index
-        WHERE gc.subject_id = :subjectId
-            AND gc.semester = :semester
-        ORDER BY gc.score_type, gen.entry_index
-    """, nativeQuery = true)
+    SELECT gc.grade_config_id AS gradeConfigId,
+           gc.score_type      AS gradeConfigName,
+           gc.weight          AS weight,
+           gc.max_entries     AS maxEntries,
+           gc.subject_id      AS subjectId,
+           gc.semester        AS semester,
+           gc.academic_year   AS academicYear,
+           gen.entry_index    AS entryIndex,
+           g.score            AS score
+    FROM grade_config gc
+    JOIN (
+        SELECT 1 AS entry_index UNION ALL
+        SELECT 2 UNION ALL
+        SELECT 3 UNION ALL
+        SELECT 4 UNION ALL
+        SELECT 5
+    ) gen ON gen.entry_index <= gc.max_entries
+    LEFT JOIN grades g ON g.grade_config_id = gc.grade_config_id
+        AND g.student_id = :studentId
+        AND g.entry_index = gen.entry_index
+    WHERE gc.subject_id = :subjectId
+        AND gc.semester = :semester
+        AND gc.academic_year = :academicYear
+    ORDER BY gc.score_type, gen.entry_index
+""", nativeQuery = true)
     List<GradeRawRow> findStudentGradeBySubject(
             @Param("studentId") String studentId,
             @Param("subjectId") String subjectId,
-            @Param("semester") Integer semester
+            @Param("semester") Integer semester,
+            @Param("academicYear") int academicYear
     );
 
     Optional<Grade> findByStudentIdAndGradeConfigIdAndEntryIndex(String studentId, Long gradeConfigId, Integer entryIndex);
 
     List<Grade> findByStudentIdAndGradeConfigIdIn(String studentId, List<Long> gradeConfigIds);
-
-    List<Grade> findByStudentIdInAndGradeConfigIdIn(
-            List<String> studentIds, List<Long> gradeConfigIds
-    );
 
 }

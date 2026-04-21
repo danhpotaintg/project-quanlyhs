@@ -58,4 +58,13 @@ public class GradeConfigController {
                 .result(gradeConfigService.getGradeConfigFor1Sub(subjectId))
                 .build();
     }
+
+    @GetMapping("/bulk-year-semseter/{subjectId}")
+    public ApiResponse<GradeConfigBulkResponse> getGradeConfigSubYearSemester(@PathVariable String subjectId,
+                                                                              @RequestParam int academicYear,
+                                                                              @RequestParam Integer semester){
+        return ApiResponse.<GradeConfigBulkResponse>builder()
+                .result(gradeConfigService.getGradeConfigBySubjectIdAndAcademicYearAndSemester(subjectId, academicYear, semester))
+                .build();
+    }
 }
