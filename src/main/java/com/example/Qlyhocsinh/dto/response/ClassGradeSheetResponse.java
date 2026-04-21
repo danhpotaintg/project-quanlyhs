@@ -10,6 +10,13 @@ import java.util.Map;
 @Builder
 public class ClassGradeSheetResponse {
 
+
+    private String className;
+    private Integer academicYear;
+    private String subjectName;
+    private String teacherName;
+    private Integer semester;
+
     private List<GradeConfigDto> gradeConfigs;
     private List<StudentGradeRow> students;
 

@@ -17,6 +17,7 @@ public class GradeConfigResponse {
     String subjectName;
 
     Integer semester;
+    int academicYear;
     String scoreType;
     Double weight;
     Integer maxEntries;

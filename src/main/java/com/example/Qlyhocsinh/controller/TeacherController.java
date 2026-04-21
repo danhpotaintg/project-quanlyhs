@@ -24,6 +24,7 @@ public class TeacherController {
 
     private final TeacherService teacherService;
     private final SubjectService subjectService;
+    private final TeacherImportService teacherImportService;
     @PostMapping
     ApiResponse<TeacherResponse> createTeacher(@RequestBody TeacherCreationRequest request) {
         return ApiResponse.<TeacherResponse>builder()
@@ -59,9 +60,8 @@ public class TeacherController {
                 .result(teacherService.getTeacherInfo())
                 .build();
     }
-    private final TeacherImportService teacherImportService; // Tiêm service vào
 
-    // API Xem trước
+
     @PostMapping("/import/preview")
     public ApiResponse<List<TeacherPreviewCreationResponse>> getPreview(@RequestParam("file") MultipartFile file) throws Exception {
         return ApiResponse.<List<TeacherPreviewCreationResponse>>builder()
@@ -69,7 +69,6 @@ public class TeacherController {
                 .build();
     }
 
-    // API Xác nhận tạo (Chỉ có 1 nút tạo dữ liệu Xanh nên không cần biến mode nữa)
     @PostMapping("/import/confirm")
     public ApiResponse<String> confirmImport(@RequestParam("file") MultipartFile file) throws Exception {
         return ApiResponse.<String>builder()
