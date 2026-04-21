@@ -51,6 +51,7 @@ public class StudentService {
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole("STUDENT");
+        user.setActive(true);
 
         ClassRoom classRoom = classRepository.findByClassName(request.getClassName())
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
