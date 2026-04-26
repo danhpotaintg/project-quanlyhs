@@ -57,6 +57,7 @@ public class TeacherService {
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole("TEACHER");
+        user.setActive(true);
 
         Teacher teacher = teacherMapper.toTeacher(request);
         teacher.setUser(user);
