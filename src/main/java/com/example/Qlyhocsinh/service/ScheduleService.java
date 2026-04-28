@@ -1,7 +1,7 @@
 package com.example.Qlyhocsinh.service;
 
 import com.example.Qlyhocsinh.dto.request.ScheduleRequest;
-import com.example.Qlyhocsinh.dto.request.TeacherStatisticRequest;
+import com.example.Qlyhocsinh.dto.request.SemesterAndAcademicYearRequest;
 import com.example.Qlyhocsinh.dto.response.ClassResponse;
 import com.example.Qlyhocsinh.dto.response.ScheduleResponse;
 import com.example.Qlyhocsinh.entity.*;
@@ -9,7 +9,6 @@ import com.example.Qlyhocsinh.exception.AppException;
 import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.ClassMapper;
 import com.example.Qlyhocsinh.mapper.ScheduleMapper;
-import com.example.Qlyhocsinh.mapper.StudentMapper;
 import com.example.Qlyhocsinh.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -120,7 +119,7 @@ public class ScheduleService {
 
         return scheduleMapper.toScheduleResponseList(schedules);
     }
-    public List<ScheduleResponse> getAllScheduleByTeacher(String teacherId, TeacherStatisticRequest request){
+    public List<ScheduleResponse> getAllScheduleByTeacher(String teacherId, SemesterAndAcademicYearRequest request){
 
         List<Schedule> schedules = scheduleRepository.findByTeacherIdAndSemesterAndAcademicYear(teacherId, request.getSemester(),request.getAcademicYear());
 

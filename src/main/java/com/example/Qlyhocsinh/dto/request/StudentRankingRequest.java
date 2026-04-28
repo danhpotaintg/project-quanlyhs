@@ -1,5 +1,6 @@
 package com.example.Qlyhocsinh.dto.request;
 
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,7 +9,11 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TeacherStatisticRequest {
+public class StudentRankingRequest {
+
+    int studentCohort;
+    String subjectId;
     int semester;
     int academicYear;
+    int rankingQuantity;
 }

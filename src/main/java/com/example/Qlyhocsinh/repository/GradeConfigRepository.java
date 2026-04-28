@@ -13,4 +13,5 @@ public interface GradeConfigRepository extends JpaRepository<GradeConfig, Long> 
 
     List<GradeConfig> findBySubjectIdAndAcademicYearAndSemester(String subjectId, int academicYear, Integer semester);
 
+    List<GradeConfig> findBySubjectIdAndSemesterAndAcademicYear(String subjectId, int semester,int academicYear);
 }

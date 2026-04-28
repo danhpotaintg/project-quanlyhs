@@ -13,10 +13,7 @@ import com.example.Qlyhocsinh.entity.Subject;
 import com.example.Qlyhocsinh.exception.AppException;
 import com.example.Qlyhocsinh.exception.ErrorCode;
 import com.example.Qlyhocsinh.mapper.GradeMapper;
-import com.example.Qlyhocsinh.repository.GradeConfigRepository;
-import com.example.Qlyhocsinh.repository.GradeRepository;
-import com.example.Qlyhocsinh.repository.StudentRepository;
-import com.example.Qlyhocsinh.repository.SubjectRepository;
+import com.example.Qlyhocsinh.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +32,9 @@ public class GradeService {
     private final GradeMapper gradeMapper;
     private final GradeConfigRepository gradeConfigRepository;
     private final StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
     private final SubjectRepository subjectRepository;
+    private final ClassRepository classRepository;
 
     //  nhập 1 điểm cho 1 học sinh (tạo và sửa điểm cho 1)
     @PreAuthorize("hasRole('TEACHER')")
@@ -220,6 +219,9 @@ public class GradeService {
 
         return ClassGradeSheetResponse.builder()
                 .gradeConfigs(configDtos)
+                .className(classRepository.findById(classId).get().getClassName())
+                .subjectName(subjectRepository.findById(subjectId).get().getSubjectName())
+                //.teacherName(teacherRepository.findById(teac))
                 .semester(semester)
                 .academicYear(academicYear)
                 .students(studentRows)
