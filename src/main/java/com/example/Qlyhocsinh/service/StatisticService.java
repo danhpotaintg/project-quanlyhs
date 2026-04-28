@@ -4,6 +4,7 @@ package com.example.Qlyhocsinh.service;
 import com.example.Qlyhocsinh.dto.request.StudentRankingRequest;
 import com.example.Qlyhocsinh.dto.request.SemesterAndAcademicYearRequest;
 import com.example.Qlyhocsinh.dto.response.StudentGradeResponse;
+import com.example.Qlyhocsinh.dto.response.StudentRankingResponse;
 import com.example.Qlyhocsinh.dto.response.TeacherStatisticResponse;
 import com.example.Qlyhocsinh.entity.Grade;
 import com.example.Qlyhocsinh.entity.GradeConfig;
@@ -34,9 +35,9 @@ public class StatisticService {
         return teacherRepository.getTeacherStatistics(request.getSemester(),request.getAcademicYear());
     }
 
-    public List<StudentGradeResponse> getStudentsHighestScoreBySubject(StudentRankingRequest request) {
+    public List<StudentRankingResponse> getStudentsHighestScoreBySubject(StudentRankingRequest request) {
 
-        // 1. Lấy danh sách các học sinh có điểm cao nhất từ database dựa trên điều kiện tìm kiếm và phân trang
+        // 1. Lấy danh sách các học sinh có điểm cao nhất từ database
         List<Student> topStudents = studentRepository.findTopStudentsBySubjectAndSemester(
                 request.getSubjectId(),
                 request.getSemester(),
@@ -46,38 +47,37 @@ public class StatisticService {
         );
 
         // 2. Lấy danh sách cấu hình điểm (GradeConfig) của môn học trong học kỳ và năm học tương ứng
-        // Ví dụ: Cấu hình điểm miệng (hệ số 1, tối đa 1 cột), điểm 15 phút (hệ số 1, tối đa 3 cột), v.v.
         List<GradeConfig> gradeConfigs = gradeConfigRepository.findBySubjectIdAndSemesterAndAcademicYear(
                 request.getSubjectId(),
                 request.getSemester(),
                 request.getAcademicYear()
         );
 
-        // Trích xuất danh sách ID của các cấu hình điểm để phục vụ cho việc truy vấn điểm thực tế
+        // Trích xuất danh sách ID của các cấu hình điểm
         List<Long> configIds = gradeConfigs.stream()
                 .map(GradeConfig::getId)
                 .collect(Collectors.toList());
 
-        // 3. Khởi tạo danh sách rỗng để chứa kết quả trả về cho client
-        List<StudentGradeResponse> responseList = new ArrayList<>();
+        // 3. Khởi tạo danh sách rỗng chứa kết quả DTO mới
+        List<StudentRankingResponse> responseList = new ArrayList<>();
 
-        // 4. Lặp qua từng học sinh trong danh sách top để tính toán điểm và ánh xạ dữ liệu
+        // 4. Lặp qua từng học sinh trong danh sách top để tính toán
         for (Student student : topStudents) {
 
-            // Truy vấn toàn bộ các điểm số mà học sinh này đã đạt được thuộc về các cấu hình điểm ở trên
+            // Truy vấn toàn bộ các điểm số mà học sinh này đạt được
             List<Grade> studentGrades = gradeRepository.findByStudentIdAndGradeConfigIdIn(
                     student.getId(),
                     configIds
             );
 
-            double totalWeightedScore = 0.0;  // Biến lưu tổng điểm sau khi đã nhân hệ số
-            double totalExpectedWeight = 0.0; // Biến lưu tổng hệ số quy định của toàn bộ môn học
-            List<StudentGradeResponse.GradeConfigDetail> configDetails = new ArrayList<>();
+            double totalWeightedScore = 0.0;
+            double totalExpectedWeight = 0.0;
+            List<StudentRankingResponse.GradeConfigDetail> configDetails = new ArrayList<>();
 
-            // 5. Duyệt qua từng cấu hình điểm để tính toán chi tiết
+            // 5. Duyệt qua từng cấu hình điểm
             for (GradeConfig config : gradeConfigs) {
 
-                // Lọc ra các con điểm thực tế của học sinh khớp với cấu hình điểm đang xét
+                // Lọc ra điểm của học sinh khớp với cấu hình hiện tại
                 List<Double> scores = new ArrayList<>();
                 for (Grade g : studentGrades) {
                     if (g.getGradeConfigId().equals(config.getId())) {
@@ -85,65 +85,54 @@ public class StatisticService {
                     }
                 }
 
-                // Tính tổng các con điểm đã được giáo viên nhập cho loại cấu hình này
+                // Tính tổng các điểm của cấu hình này
                 double sumForThisConfig = 0.0;
                 for (Double score : scores) {
                     sumForThisConfig += score;
                 }
 
-                // Tính điểm trung bình của loại cấu hình này
-                // Chia cho số cột điểm tối đa quy định (maxEntries) để đánh giá đúng tiến độ và điểm số thực tế
+                // Tính điểm trung bình của cấu hình điểm này (chia cho số đầu điểm quy định)
                 double avgScoreForThisConfig = 0.0;
                 if (config.getMaxEntries() != null && config.getMaxEntries() > 0) {
                     avgScoreForThisConfig = sumForThisConfig / config.getMaxEntries();
                 }
 
-                // Cộng dồn điểm thành phần (đã nhân trọng số) vào tổng điểm môn học
+                // Cộng dồn điểm và hệ số vào tổng chung
                 totalWeightedScore += (avgScoreForThisConfig * config.getWeight());
-
-                // Cộng dồn trọng số của cấu hình điểm này vào tổng trọng số quy định
                 totalExpectedWeight += config.getWeight();
 
-                // Đóng gói thông tin chi tiết của loại cấu hình điểm này vào DTO để hiển thị
-                StudentGradeResponse.GradeConfigDetail detail = StudentGradeResponse.GradeConfigDetail.builder()
+                // Đóng gói chi tiết điểm theo DTO nội bộ (Inner Class) mới
+                StudentRankingResponse.GradeConfigDetail detail = StudentRankingResponse.GradeConfigDetail.builder()
                         .gradeConfigId(config.getId())
+
                         .scoreType(config.getScoreType())
                         .weight(config.getWeight())
                         .maxEntries(config.getMaxEntries())
-                        .scores(scores) // Truyền danh sách các con điểm đã nhập để frontend có thể render
+                        .scores(scores)
                         .build();
 
-                // Thêm chi tiết điểm vào danh sách cấu hình của học sinh
                 configDetails.add(detail);
             }
 
-            // 6. Tính điểm trung bình tổng kết học kỳ của môn học
-            // Công thức: Tổng (Điểm trung bình thành phần * Hệ số) / Tổng hệ số quy định
+            // 6. Tính điểm trung bình tổng kết học kỳ và làm tròn 2 chữ số thập phân
             double semesterAvg = (totalExpectedWeight > 0) ? (totalWeightedScore / totalExpectedWeight) : 0.0;
-
-            // Làm tròn điểm trung bình đến 2 chữ số thập phân (ví dụ: 8.666... sẽ thành 8.67)
             semesterAvg = Math.round(semesterAvg * 100.0) / 100.0;
 
-            // Truy vấn tên môn học từ database dựa trên subjectId
-            String subjectName = subjectRepository.findById(request.getSubjectId())
-                    .get()
-                    .getSubjectName();
+            String className = student.getClassRoom() != null ? student.getClassRoom().getClassName() : "Chưa có lớp";
 
-            // 7. Khởi tạo đối tượng Response chứa toàn bộ thông tin kết quả học tập của học sinh
-            StudentGradeResponse studentResponse = StudentGradeResponse.builder()
-                    .subjectId(request.getSubjectId())
-                    .subjectName(subjectName)
-                    .semester(request.getSemester())
-                    .academicYear(request.getAcademicYear())
+            // 7. Khởi tạo đối tượng Response MỚI (StudentRankingResponse)
+            StudentRankingResponse studentResponse = StudentRankingResponse.builder()
+                    .studentName(student.getFullName())
+                    .className(className)// Lấy tên trực tiếp từ Entity Student
                     .semesterAverage(semesterAvg)
                     .gradeConfigs(configDetails)
                     .build();
 
-            // 8. Thêm học sinh vừa xử lý xong vào danh sách kết quả tổng
+            // 8. Thêm học sinh vào danh sách kết quả
             responseList.add(studentResponse);
         }
 
-        // 9. Trả về danh sách xếp hạng đã được tính toán và ánh xạ hoàn chỉnh
+        // 9. Trả về danh sách xếp hạng
         return responseList;
     }
 }
