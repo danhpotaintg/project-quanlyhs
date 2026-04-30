@@ -19,4 +19,6 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     @Query("SELECT s FROM Student s WHERE s.classRoom.id = :classId AND s.user.isActive = true")
     List<Student> findAllActiveByClass(Long classId);
+
 }
+
