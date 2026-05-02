@@ -78,6 +78,7 @@ public class GradeController {
 
     }
 
+
     @GetMapping("/student/subjects")
     public ApiResponse<List<SubjectResponse>> getSubjects(
             @RequestParam Integer semester,

@@ -38,4 +38,6 @@ public interface StudentRepository extends JpaRepository<Student, String> {
             @Param("academicYear") int academicYear,
             @Param("studentCohort") int studentCohort,
             Pageable pageable);
+
 }
+

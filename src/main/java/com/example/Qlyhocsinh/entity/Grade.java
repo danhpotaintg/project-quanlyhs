@@ -1,6 +1,5 @@
 package com.example.Qlyhocsinh.entity;
 
-import com.example.Qlyhocsinh.enums.GradeStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
