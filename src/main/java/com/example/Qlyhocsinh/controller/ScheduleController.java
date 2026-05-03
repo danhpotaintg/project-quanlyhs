@@ -38,31 +38,31 @@ public class ScheduleController {
                 .build();
     }
 
-    @GetMapping("/teacher")
-    ApiResponse<List<ScheduleResponse>> getAllScheduleByTeacher() {
+    @GetMapping("/teacher/{semester}/{academicYear}")
+    ApiResponse<List<ScheduleResponse>> getAllScheduleByTeacher(@PathVariable int semester, @PathVariable int academicYear) {
         return ApiResponse.<List<ScheduleResponse>>builder()
-                .result(scheduleService.getAllScheduleByTeacher())
+                .result(scheduleService.getAllScheduleByTeacher(semester, academicYear))
                 .build();
     }
 
-    @GetMapping("/teacher/{teacherId}")
-    ApiResponse<List<ScheduleResponse>> getAllScheduleByTeacherId(@PathVariable String teacherId) {
+    @GetMapping("/teacher/{teacherId}/{semester}/{academicYear}")
+    ApiResponse<List<ScheduleResponse>> getAllScheduleByTeacherId(@PathVariable String teacherId, @PathVariable int semester, @PathVariable int academicYear) {
         return ApiResponse.<List<ScheduleResponse>>builder()
-                .result(scheduleService.getAllScheduleByTeacherID(teacherId))
+                .result(scheduleService.getAllScheduleByTeacherID(teacherId, semester, academicYear))
                 .build();
     }
 
-    @GetMapping("/student")
-    ApiResponse<List<ScheduleResponse>> getAllScheduleByStudent() {
+    @GetMapping("/student/{semester}/{academicYear}")
+    ApiResponse<List<ScheduleResponse>> getAllScheduleByStudent(@PathVariable int semester, @PathVariable int academicYear) {
         return ApiResponse.<List<ScheduleResponse>>builder()
-                .result(scheduleService.getAllScheduleByStudent())
+                .result(scheduleService.getAllScheduleByStudent(semester, academicYear))
                 .build();
     }
 
-    @GetMapping("/class/{classId}")
-    ApiResponse<List<ScheduleResponse>> getAllScheduleByClass(@PathVariable Long classId) {
+    @GetMapping("/class/{classId}/{semester}/{academicYear}")
+    ApiResponse<List<ScheduleResponse>> getAllScheduleByClass(@PathVariable Long classId, @PathVariable int semester, @PathVariable int academicYear) {
         return ApiResponse.<List<ScheduleResponse>>builder()
-                .result(scheduleService.getAllScheduleByClass(classId))
+                .result(scheduleService.getAllScheduleByClass(classId, semester, academicYear))
                 .build();
     }
 
@@ -74,10 +74,10 @@ public class ScheduleController {
                 .build();
     }
 
-    @GetMapping("/teacher-classes")
-    ApiResponse<List<ClassResponse>> getAllClassByTeacherId(){
+    @GetMapping("/teacher-classes/{academicYear}")
+    ApiResponse<List<ClassResponse>> getAllClassByTeacherId(@PathVariable int academicYear){
         return ApiResponse.<List<ClassResponse>>builder()
-                .result(scheduleService.getAllClassByTeacher())
+                .result(scheduleService.getAllClassByTeacher(academicYear))
                 .build();
     }
 

@@ -96,26 +96,26 @@ public class ScheduleService {
         return scheduleMapper.toScheduleResponse(schedule);
     }
 
-    public List<ClassResponse> getAllClassByTeacher(){
+    public List<ClassResponse> getAllClassByTeacher(int academicYear){
         var context = SecurityContextHolder.getContext();
         String teacherName = context.getAuthentication().getName();
 
         Teacher teacher = teacherRepository.findByUserUsername(teacherName)
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
-        List<ClassRoom> classes = scheduleRepository.findDistinctClassByTeacherId(teacher.getId());
+        List<ClassRoom> classes = scheduleRepository.findDistinctClassByTeacherId(teacher.getId(), academicYear);
 
         return classMapper.toClassResponseList(classes);
     }
 
-    public List<ScheduleResponse> getAllScheduleByTeacher(){
+    public List<ScheduleResponse> getAllScheduleByTeacher(int semester, int academicYear){
         var context = SecurityContextHolder.getContext();
         String teacherName = context.getAuthentication().getName();
 
         Teacher teacher = teacherRepository.findByUserUsername(teacherName)
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
-        List<Schedule> schedules = scheduleRepository.findByTeacherId(teacher.getId());
+        List<Schedule> schedules = scheduleRepository.findByTeacherIdAndSemesterAndAcademicYear(teacher.getId(), semester, academicYear);
 
         return scheduleMapper.toScheduleResponseList(schedules);
     }
@@ -126,31 +126,31 @@ public class ScheduleService {
         return scheduleMapper.toScheduleResponseList(schedules);
     }
 
-    public List<ScheduleResponse> getAllScheduleByStudent(){
+    public List<ScheduleResponse> getAllScheduleByStudent(int semester, int academicYear){
         var context = SecurityContextHolder.getContext();
         String studentName = context.getAuthentication().getName();
 
         Student student = studentRepository.findByUserUsername(studentName)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
-        List<Schedule> schedules = scheduleRepository.findByClassRoomId(student.getClassRoom().getId());
+        List<Schedule> schedules = scheduleRepository.findByClassRoomIdAndSemesterAndAcademicYear(student.getClassRoom().getId(), semester, academicYear);
 
         return scheduleMapper.toScheduleResponseList(schedules);
     }
 
-    public List<ScheduleResponse> getAllScheduleByClass(Long classId){
-        List<Schedule> schedules = scheduleRepository.findByClassRoomId(classId);
+    public List<ScheduleResponse> getAllScheduleByClass(Long classId, int semester, int academicYear){
+        List<Schedule> schedules = scheduleRepository.findByClassRoomIdAndSemesterAndAcademicYear(classId, semester, academicYear);
 
         return scheduleMapper.toScheduleResponseList(schedules);
 
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public List<ScheduleResponse> getAllScheduleByTeacherID(String teacherId){
+    public List<ScheduleResponse> getAllScheduleByTeacherID(String teacherId, int semester, int academicYear){
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
-        List<Schedule> schedules = scheduleRepository.findByTeacherId(teacher.getId());
+        List<Schedule> schedules = scheduleRepository.findByTeacherIdAndSemesterAndAcademicYear(teacher.getId(), semester, academicYear);
 
         return scheduleMapper.toScheduleResponseList(schedules);
 
