@@ -21,10 +21,12 @@ public interface SubjectRepository extends JpaRepository<Subject, String> {
         JOIN schedule sc ON sc.subject_id = sub.subject_id
         WHERE sc.class_id = :classId
         AND sc.semester = :semester
+        AND sc.academic_year = :academicYear
     """, nativeQuery = true)
-    List<Subject> findByClassIdAndSemester(
+    List<Subject> findByClassIdAndSemesterAndAcademicYear(
             @Param("classId") Long classId,
-            @Param("semester") Integer semester
+            @Param("semester") Integer semester,
+            @Param("academicYear") Integer academicYear
     );
 }
 

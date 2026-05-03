@@ -85,13 +85,13 @@ public class SubjectService {
     }
 
     // Danh sách các môn học trong 1 học kì của 1 học sinh
-    public List<SubjectResponse> getSubjectsInSemester(String studentId, Integer semester){
+    public List<SubjectResponse> getSubjectsInSemesterAndYear(String studentId, Integer semester, Integer academicYear){
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
 
         List<SubjectResponse> responses = new ArrayList<>();
 
-        List<Subject> subjects = subjectRepository.findByClassIdAndSemester(student.getClassRoom().getId(), semester);
+        List<Subject> subjects = subjectRepository.findByClassIdAndSemesterAndAcademicYear(student.getClassRoom().getId(), semester, academicYear);
         for(Subject subject : subjects){
             SubjectResponse subjectResponse = SubjectResponse.builder()
                     .id(subject.getId())

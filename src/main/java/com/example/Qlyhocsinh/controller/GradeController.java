@@ -82,10 +82,11 @@ public class GradeController {
     @GetMapping("/student/subjects")
     public ApiResponse<List<SubjectResponse>> getSubjects(
             @RequestParam Integer semester,
+            @RequestParam int academicYear,
             @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
         String studentId = jwt.getClaimAsString("userId");
         return ApiResponse.<List<SubjectResponse>>builder()
-                .result(subjectService.getSubjectsInSemester(studentId, semester))
+                .result(subjectService.getSubjectsInSemesterAndYear(studentId, semester, academicYear))
                 .build();
 
     }
@@ -93,8 +94,8 @@ public class GradeController {
     @GetMapping("/student/subject/{subjectId}")
     public ApiResponse<StudentGradeResponse> getGradesBySubject(
             @PathVariable String subjectId,
-            @RequestParam int academicYear,
             @RequestParam Integer semester,
+            @RequestParam Integer academicYear,
             @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
         String studentId = jwt.getClaimAsString("userId");
         return ApiResponse.<StudentGradeResponse>builder()
