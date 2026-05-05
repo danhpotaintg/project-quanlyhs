@@ -3,10 +3,7 @@ package com.example.Qlyhocsinh.controller;
 import com.example.Qlyhocsinh.dto.request.ApiResponse;
 import com.example.Qlyhocsinh.dto.request.GradeBatchRequest;
 import com.example.Qlyhocsinh.dto.request.GradeRequest;
-import com.example.Qlyhocsinh.dto.response.ClassGradeSheetResponse;
-import com.example.Qlyhocsinh.dto.response.GradeResponse;
-import com.example.Qlyhocsinh.dto.response.StudentGradeResponse;
-import com.example.Qlyhocsinh.dto.response.SubjectResponse;
+import com.example.Qlyhocsinh.dto.response.*;
 import com.example.Qlyhocsinh.service.GradeService;
 import com.example.Qlyhocsinh.service.SubjectService;
 import jakarta.validation.Valid;
@@ -101,5 +98,16 @@ public class GradeController {
                 .result(gradeService.getGradesBySubject(studentId, subjectId, semester, academicYear))
                 .build();
 
+    }
+
+    @GetMapping("my-grades")
+    public ApiResponse<StudentAllGradeResponse> getAllGradeStudent(
+            @RequestParam int academicYear,
+            @RequestParam Integer semester,
+            @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt){
+        String studentId = jwt.getClaimAsString("userId");
+        return ApiResponse.<StudentAllGradeResponse>builder()
+                .result(gradeService.getAllSubjectsGrade(studentId, semester, academicYear))
+                .build();
     }
 }

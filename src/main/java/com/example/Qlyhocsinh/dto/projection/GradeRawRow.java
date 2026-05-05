@@ -11,5 +11,6 @@ public interface GradeRawRow {
     Integer getEntryIndex();
     Double getScore();
     String getSubjectId();
+    String getSubjectName();
     int getAcademicYear();
 }
