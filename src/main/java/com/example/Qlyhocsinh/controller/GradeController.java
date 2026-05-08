@@ -5,9 +5,11 @@ import com.example.Qlyhocsinh.dto.request.GradeBatchRequest;
 import com.example.Qlyhocsinh.dto.request.GradeRequest;
 import com.example.Qlyhocsinh.dto.response.*;
 import com.example.Qlyhocsinh.service.GradeService;
+import com.example.Qlyhocsinh.service.StudyAdviceService;
 import com.example.Qlyhocsinh.service.SubjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +22,8 @@ public class GradeController {
 
     private final GradeService gradeService;
     private final SubjectService subjectService;
+    private final StudyAdviceService studyAdviceService;
 
-    /**
-     * POST /quanly/grades
-     * Nhập điểm 1 học sinh.
-     * Chỉ TEACHER mới được nhập điểm.
-     */
 
     @PostMapping("/{studentId}/{gradeConfigId}")
     public ApiResponse<GradeResponse> createGrade(@Valid @RequestBody GradeRequest request,
@@ -51,7 +49,6 @@ public class GradeController {
      * }
      */
 
-
     @PostMapping("/{studentId}/batch")
     public ApiResponse<List<GradeResponse>> saveBatch(@PathVariable String studentId,
                                                       @RequestBody GradeBatchRequest request,
@@ -74,7 +71,6 @@ public class GradeController {
                 .build();
 
     }
-
 
     @GetMapping("/student/subjects")
     public ApiResponse<List<SubjectResponse>> getSubjects(
@@ -108,6 +104,20 @@ public class GradeController {
         String studentId = jwt.getClaimAsString("userId");
         return ApiResponse.<StudentAllGradeResponse>builder()
                 .result(gradeService.getAllSubjectsGrade(studentId, semester, academicYear))
+                .build();
+    }
+
+    @GetMapping("/my-advices")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ApiResponse<List<SubjectAdviceResponse>> getMyAdvices(
+            @RequestParam Integer semester,
+            @RequestParam int academicYear,
+            @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
+        String studentId = jwt.getClaimAsString("userId");
+
+        return ApiResponse.<List<SubjectAdviceResponse>>builder()
+                .result(studyAdviceService.getAdvicesForStudent(
+                        studentId, semester, academicYear))
                 .build();
     }
 }

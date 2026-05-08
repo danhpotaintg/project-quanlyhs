@@ -5,8 +5,6 @@ import com.example.Qlyhocsinh.dto.response.GradeResponse;
 import com.example.Qlyhocsinh.entity.Grade;
 import org.mapstruct.*;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface GradeMapper {
 
