@@ -5,6 +5,7 @@ import com.example.Qlyhocsinh.dto.request.GradeBatchRequest;
 import com.example.Qlyhocsinh.dto.request.GradeRequest;
 import com.example.Qlyhocsinh.dto.response.ClassGradeSheetResponse;
 import com.example.Qlyhocsinh.dto.response.GradeResponse;
+import com.example.Qlyhocsinh.dto.response.StudentAllGradeResponse;
 import com.example.Qlyhocsinh.dto.response.StudentGradeResponse;
 import com.example.Qlyhocsinh.entity.Grade;
 import com.example.Qlyhocsinh.entity.GradeConfig;
@@ -311,6 +312,137 @@ public class GradeService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('STUDENT')")
+    public StudentAllGradeResponse getAllSubjectsGrade(
+            String studentId, Integer semester, int academicYear) {
+
+        studentRepository.findById(studentId)
+                .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+        List<GradeRawRow> rows = gradeRepository
+                .findAllSubjectsGradeByStudent(studentId, semester, academicYear);
+
+        if (rows.isEmpty()) throw new AppException(ErrorCode.GRADE_CONFIG_NOT_FOUND);
+
+        String studentName = rows.get(0).getStudentName();
+
+        // Group theo subjectId
+        Map<String, List<GradeRawRow>> bySubject = new LinkedHashMap<>();
+        for (GradeRawRow row : rows) {
+            bySubject.computeIfAbsent(row.getSubjectId(), k -> new ArrayList<>()).add(row);
+        }
+
+        List<StudentAllGradeResponse.SubjectGradeSummary> subjects = new ArrayList<>();
+        List<Double> allSubjectAverages = new ArrayList<>(); // để tính GPA
+
+        for (Map.Entry<String, List<GradeRawRow>> subjectEntry : bySubject.entrySet()) {
+            List<GradeRawRow> subjectRows = subjectEntry.getValue();
+            GradeRawRow firstSubjectRow = subjectRows.get(0);
+
+            // Group theo gradeConfigId
+            Map<Long, List<GradeRawRow>> byConfig = new LinkedHashMap<>();
+            for (GradeRawRow row : subjectRows) {
+                byConfig.computeIfAbsent(row.getGradeConfigId(), k -> new ArrayList<>()).add(row);
+            }
+
+            List<StudentAllGradeResponse.GradeConfigDetail> configDetails = new ArrayList<>();
+            double totalWeightedScore = 0;
+            double totalWeight = 0;
+            boolean canCalculate = true;
+
+            for (Map.Entry<Long, List<GradeRawRow>> configEntry : byConfig.entrySet()) {
+                List<GradeRawRow> configRows = configEntry.getValue();
+                configRows.sort(Comparator.comparing(GradeRawRow::getEntryIndex));
+
+                GradeRawRow firstConfigRow = configRows.get(0);
+
+                List<Double> scores = configRows.stream()
+                        .map(GradeRawRow::getScore)
+                        .collect(Collectors.toList());
+
+                configDetails.add(StudentAllGradeResponse.GradeConfigDetail.builder()
+                        .gradeConfigId(configEntry.getKey())
+                        .scoreType(firstConfigRow.getGradeConfigName())
+                        .weight(firstConfigRow.getWeight())
+                        .maxEntries(firstConfigRow.getMaxEntries())
+                        .scores(scores)
+                        .build());
+
+                List<Double> validScores = scores.stream()
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+
+                if (validScores.isEmpty()) {
+                    canCalculate = false;
+                } else {
+                    double avg = validScores.stream()
+                            .mapToDouble(Double::doubleValue)
+                            .average()
+                            .orElse(0);
+                    totalWeightedScore += avg * firstConfigRow.getWeight();
+                    totalWeight += firstConfigRow.getWeight();
+                }
+            }
+
+            Double semesterAverage = null;
+            if (canCalculate && totalWeight > 0) {
+                semesterAverage = Math.round((totalWeightedScore / totalWeight) * 100.0) / 100.0;
+                allSubjectAverages.add(semesterAverage);
+            }
+
+            subjects.add(StudentAllGradeResponse.SubjectGradeSummary.builder()
+                    .subjectId(subjectEntry.getKey())
+                    .subjectName(firstSubjectRow.getSubjectName())
+                    .gradeConfigs(configDetails)
+                    .semesterAverage(semesterAverage)
+                    .build());
+        }
+
+        // Tính GPA (TB tất cả môn)
+        Double semesterGPA = null;
+        String academicRank = null;
+        String title = null;
+
+        if (allSubjectAverages.size() == bySubject.size()) {
+            // Chỉ tính khi tất cả môn đều có TBM
+            semesterGPA = Math.round(
+                    allSubjectAverages.stream()
+                            .mapToDouble(Double::doubleValue)
+                            .average()
+                            .orElse(0) * 100.0) / 100.0;
+
+            academicRank = calculateAcademicRank(semesterGPA);
+            title = calculateTitle(semesterGPA, academicRank);
+        }
+
+        return StudentAllGradeResponse.builder()
+                .studentId(studentId)
+                .studentName(studentName)
+                .semester(semester)
+                .academicYear(academicYear)
+                .semesterGPA(semesterGPA)
+                .academicRank(academicRank)
+                .title(title)
+                .subjects(subjects)
+                .build();
+    }
+
+    private String calculateAcademicRank(Double gpa) {
+        if (gpa == null) return null;
+        if (gpa >= 8.0) return "Giỏi";
+        if (gpa >= 6.5) return "Khá";
+        if (gpa >= 5.0) return "Trung bình";
+        if (gpa >= 3.5) return "Yếu";
+        return "Kém";
+    }
+
+    private String calculateTitle(Double gpa, String academicRank) {
+        if (gpa == null || academicRank == null) return null;
+        if (gpa >= 9.0 && "Giỏi".equals(academicRank)) return "Học sinh xuất sắc";
+        if (gpa >= 8.0 && "Giỏi".equals(academicRank)) return "Học sinh giỏi";
+        if ("Khá".equals(academicRank)) return "Học sinh tiên tiến";
+        return null; // TB, Yếu, Kém không có danh hiệu
+    }
 
     private void validateEntryIndex(Integer entryIndex, Integer maxEntries) {
         if (entryIndex < 1 || entryIndex > maxEntries) {
