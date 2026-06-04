@@ -222,7 +222,6 @@ public class GradeService {
                 .gradeConfigs(configDtos)
                 .className(classRepository.findById(classId).get().getClassName())
                 .subjectName(subjectRepository.findById(subjectId).get().getSubjectName())
-                //.teacherName(teacherRepository.findById(teac))
                 .semester(semester)
                 .academicYear(academicYear)
                 .students(studentRows)
