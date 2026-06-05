@@ -51,6 +51,29 @@ public class AttendanceService {
         return attendanceMapper.toAttendanceResponse(attendanceRepository.save(attendance));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    public List<AttendanceResponse> createMultiAttendances(List<AttendanceRequest> requests) {
+        var context = SecurityContextHolder.getContext();
+        String username = context.getAuthentication().getName();
+        Teacher teacher = teacherRepository.findByUserUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Attendance> attendances = requests.stream().map(request -> {
+            Student student = studentRepository.findById(request.getStudentId())
+                    .orElseThrow(() -> new AppException(ErrorCode.STUDENT_NOT_FOUND));
+
+            Attendance attendance = attendanceMapper.toAttendance(request);
+            attendance.setCheckInTime(now);
+            attendance.setStudent(student);
+            attendance.setTeacher(teacher);
+            return attendance;
+        }).toList();
+
+        return attendanceMapper.toAttendanceResponseList(attendanceRepository.saveAll(attendances));
+    }
+
     public AttendanceResponse updateAttendance(Long id, AttendanceRequest request){
         Attendance attendance = attendanceRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("Attendance not found"));

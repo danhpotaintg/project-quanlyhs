@@ -23,6 +23,14 @@ public class AttendanceController {
                 .build();
     }
 
+    //tạo nhieu điểm danh
+    @PostMapping("/multi")
+    ApiResponse<List<AttendanceResponse>> createMultipleAttendances(@RequestBody List<AttendanceRequest> requests) {
+        return ApiResponse.<List<AttendanceResponse>>builder()
+                .result(attendanceService.createMultiAttendances(requests))
+                .build();
+    }
+
     @PutMapping("/{id}")
     ApiResponse<AttendanceResponse> updateAttendance(@PathVariable Long id, @RequestBody AttendanceRequest request){
         return ApiResponse.<AttendanceResponse>builder()
