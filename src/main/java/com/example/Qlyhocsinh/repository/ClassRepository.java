@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ClassRepository extends JpaRepository<ClassRoom, Long> {
     boolean existsByTeacherUserId(String teacherId);
+    Optional<ClassRoom> findByClassNameAndAcademicYear(String className, int academicYear);
     Optional<ClassRoom> findByClassName(String className);
-
     Optional<ClassRoom> findByTeacherUserId(String userId);
 }

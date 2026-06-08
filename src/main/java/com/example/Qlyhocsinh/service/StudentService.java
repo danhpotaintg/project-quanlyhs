@@ -53,7 +53,7 @@ public class StudentService {
         user.setRole("STUDENT");
         user.setActive(true);
 
-        ClassRoom classRoom = classRepository.findByClassName(request.getClassName())
+        ClassRoom classRoom = classRepository.findByClassNameAndAcademicYear(request.getClassName(), request.getAcademicYear())
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
 
         Student student = studentMapper.toStudent(request);

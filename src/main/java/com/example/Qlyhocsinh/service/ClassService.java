@@ -39,9 +39,11 @@ public class ClassService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public ClassResponse createClass(ClassRequest request){
-        if(classRepository.findByClassName(request.getClassName()).isPresent()){
-            log.info(request.getClassName());
+
+        if(classRepository.findByClassNameAndAcademicYear(request.getClassName(), request.getAcademicYear()).isPresent()){
+            log.info(request.getClassName() + " " + request.getAcademicYear());
             throw new AppException(ErrorCode.ClASS_EXISTED);
+
         }
         ClassRoom classRoom = classMapper.toClassRoom(request);
         return classMapper.toClassResponse(classRepository.save(classRoom));

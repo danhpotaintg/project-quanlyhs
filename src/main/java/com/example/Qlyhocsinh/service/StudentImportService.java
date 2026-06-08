@@ -69,7 +69,7 @@ public class StudentImportService {
 
                 // Kiểm tra logic LỚP HỌC
                 if (!className.isEmpty()) {
-                    Optional<ClassRoom> classRoomOpt = classRepository.findByClassName(className);
+                    Optional<ClassRoom> classRoomOpt = classRepository.findByClassNameAndAcademicYear(className, academicYear);
                     if (classRoomOpt.isEmpty()) {
                         isValid = false; //lop ko ton tai
                         errorMsg.append("Lớp '").append(className).append("' không tồn tại. ");
@@ -124,7 +124,7 @@ public class StudentImportService {
                 boolean isRed = fullName.isEmpty() || dob == null || gender.isEmpty() || academicYear == 0
                         || parentGmail.isEmpty() || parentPhonenumber.isEmpty();
 
-                if (!className.isEmpty() && classRepository.findByClassName(className).isEmpty()) {
+                if (!className.isEmpty() && classRepository.findByClassNameAndAcademicYear(className, academicYear).isEmpty()) {
                     isRed = true; //lop ko ton tai
                 }
 
