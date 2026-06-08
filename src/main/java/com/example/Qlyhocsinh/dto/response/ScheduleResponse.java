@@ -14,6 +14,7 @@ public class ScheduleResponse {
 
     Long classId;
     String className;
+    int classYear;
 
     String subjectId;
     String subjectName;

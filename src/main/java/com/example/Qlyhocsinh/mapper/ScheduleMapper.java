@@ -14,6 +14,7 @@ public interface ScheduleMapper {
 
     @Mapping(source = "classRoom.id", target = "classId")
     @Mapping(source = "classRoom.className", target = "className")
+    @Mapping(source = "classRoom.academicYear", target = "classYear")
     @Mapping(source = "subject.id", target = "subjectId")
     @Mapping(source = "subject.subjectName", target = "subjectName")
     @Mapping(source = "teacher.id", target = "teacherId")
