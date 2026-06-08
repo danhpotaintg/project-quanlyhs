@@ -74,10 +74,10 @@ public class ScheduleController {
                 .build();
     }
 
-    @GetMapping("/teacher-classes/{academicYear}")
-    ApiResponse<List<ClassResponse>> getAllClassByTeacherId(@PathVariable int academicYear){
+    @GetMapping("/teacher-classes/{academicYear}/{semester}")
+    ApiResponse<List<ClassResponse>> getAllClassByTeacherId(@PathVariable int academicYear, @PathVariable int semester){
         return ApiResponse.<List<ClassResponse>>builder()
-                .result(scheduleService.getAllClassByTeacher(academicYear))
+                .result(scheduleService.getAllClassByTeacher(academicYear, semester ))
                 .build();
     }
 

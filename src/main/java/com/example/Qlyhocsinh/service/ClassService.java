@@ -168,7 +168,12 @@ public class ClassService {
         return classMapper.toClassResponse(classRepository.save(classRoom));
     }
 
+    public ClassResponse getClassInfo(Long classId){
+        ClassRoom classRoom = classRepository.findById(classId)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
 
+        return classMapper.toClassResponse(classRoom);
+    }
 
     public void removeTeacherFromClass(String teacherId, Long classId){
         ClassRoom classRoom = classRepository.findById(classId)

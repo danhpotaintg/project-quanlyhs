@@ -96,14 +96,14 @@ public class ScheduleService {
         return scheduleMapper.toScheduleResponse(schedule);
     }
 
-    public List<ClassResponse> getAllClassByTeacher(int academicYear){
+    public List<ClassResponse> getAllClassByTeacher(int academicYear, int semester){
         var context = SecurityContextHolder.getContext();
         String teacherName = context.getAuthentication().getName();
 
         Teacher teacher = teacherRepository.findByUserUsername(teacherName)
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOT_FOUND));
 
-        List<ClassRoom> classes = scheduleRepository.findDistinctClassByTeacherId(teacher.getId(), academicYear);
+        List<ClassRoom> classes = scheduleRepository.findDistinctClassByTeacherId(teacher.getId(), academicYear, semester);
 
         return classMapper.toClassResponseList(classes);
     }

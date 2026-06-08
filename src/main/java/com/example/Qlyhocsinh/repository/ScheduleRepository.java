@@ -13,8 +13,9 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<Schedule, String> {
     //lấy danh sách lớp giáo viên dang dạy
     @Query("SELECT DISTINCT s.classRoom FROM Schedule s WHERE s.teacher.id = :teacherId " +
-    "AND s.academicYear = :academicYear")
-    List<ClassRoom> findDistinctClassByTeacherId(@Param("teacherId") String teacherId, @Param("academicYear") int academicYear);
+    "AND s.academicYear = :academicYear " +
+    "AND s.semester = :semester ")
+    List<ClassRoom> findDistinctClassByTeacherId(@Param("teacherId") String teacherId, @Param("academicYear") int academicYear, @Param("semester") int semester);
 
     List<Schedule> findByTeacherId(String teacherId);
     List<Schedule> findByTeacherIdAndSemesterAndAcademicYear(String teacherId, int semester, int academicYear);

@@ -41,6 +41,13 @@ public class ClassController {
                 .build();
     }
 
+    @GetMapping("/class-info/{classId}")
+    ApiResponse<ClassResponse> getAcademicYear(@PathVariable Long classId){
+        return ApiResponse.<ClassResponse>builder()
+                .result(classService.getClassInfo(classId))
+                .build();
+    }
+
     @DeleteMapping("/{id}")
     ApiResponse<String> deleteClass(@PathVariable Long id) {
         classService.deletedClass(id);
