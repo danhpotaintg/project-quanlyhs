@@ -27,5 +27,6 @@ public class LeaveRequestResponse {
 
     String studentName;
     String className;
+    String classYear;
     String approvedByTeacherName;
 }

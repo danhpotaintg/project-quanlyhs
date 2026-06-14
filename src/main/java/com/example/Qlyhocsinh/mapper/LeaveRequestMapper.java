@@ -14,6 +14,7 @@ public interface LeaveRequestMapper {
 
     @Mapping(source = "student.fullName", target = "studentName")
     @Mapping(source = "student.classRoom.className", target = "className")
+    @Mapping(source = "student.classRoom.academicYear", target = "classYear")
     @Mapping(source = "approvedByTeacher.fullName", target = "approvedByTeacherName")
     LeaveRequestResponse toLeaveRequestResponse(LeaveRequest request);
 

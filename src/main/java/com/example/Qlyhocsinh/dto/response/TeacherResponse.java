@@ -21,6 +21,7 @@ public class TeacherResponse {
     UserResponse user;
 
     String className;
+    String classYear;
 
     String subjectName;
 
