@@ -61,7 +61,7 @@ public class StudentService {
         student.setClassRoom(classRoom);
         studentRepository.save(student);
 
-        notificationService.sendNewAccountToUser(username,studentId,student.getParentGmail(),student.getFullName());
+        //notificationService.sendNewAccountToUser(username,studentId,student.getParentGmail(),student.getFullName());
 
         return studentMapper.toStudentResponse(student);
     }

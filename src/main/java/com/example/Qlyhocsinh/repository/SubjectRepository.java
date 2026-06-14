@@ -15,6 +15,8 @@ public interface SubjectRepository extends JpaRepository<Subject, String> {
     Optional<Subject> findBySubjectName(String subjectName);
     List<Subject> findBySubjectNameIn(List<String> subjectName);
 
+    Optional<Subject> findBySubjectNameIgnoreCase(String subjectName);
+
     @Query(value = """
         SELECT DISTINCT sub.*
         FROM subject sub

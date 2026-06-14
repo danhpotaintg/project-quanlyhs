@@ -7,10 +7,8 @@ import com.example.Qlyhocsinh.dto.response.TeacherResponse;
 import com.example.Qlyhocsinh.entity.*;
 import com.example.Qlyhocsinh.exception.AppException;
 import com.example.Qlyhocsinh.exception.ErrorCode;
-import com.example.Qlyhocsinh.mapper.ClassMapper;
 import com.example.Qlyhocsinh.mapper.TeacherMapper;
 import com.example.Qlyhocsinh.mapper.UserMapper;
-import com.example.Qlyhocsinh.repository.ClassRepository;
 import com.example.Qlyhocsinh.repository.SubjectRepository;
 import com.example.Qlyhocsinh.repository.TeacherRepository;
 import com.example.Qlyhocsinh.repository.UserRepository;
@@ -22,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import java.text.Normalizer;
 
 import java.util.List;
 
@@ -49,7 +48,15 @@ public class TeacherService {
         String username = accountService.generateUsername(request.getFullName(), teacherId);
         String password = accountService.generateDefaultPassword(teacherId);
 
-        Subject subject = subjectRepository.findBySubjectName(request.getSubjectName())
+//        Subject subject = subjectRepository.findBySubjectName(request.getSubjectName())
+//                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+        String subjectName = Normalizer.normalize(
+                request.getSubjectName(),
+                Normalizer.Form.NFC
+        ).trim().replaceAll("\\s+", " ");
+
+        Subject subject = subjectRepository
+                .findBySubjectNameIgnoreCase(subjectName)
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
 
         User user = userMapper.toUser(request);
@@ -64,7 +71,7 @@ public class TeacherService {
         teacher.setSubject(subject);
 
         teacherRepository.save(teacher);
-        notificationService.sendNewAccountToUser(username,teacherId,teacher.getEmail(),teacher.getFullName());
+        //notificationService.sendNewAccountToUser(username,teacherId,teacher.getEmail(),teacher.getFullName());
         return teacherMapper.toTeacherResponse(teacher);
     }
 
