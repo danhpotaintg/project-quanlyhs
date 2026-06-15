@@ -5,7 +5,6 @@ import com.example.Qlyhocsinh.dto.request.TeacherCreationRequest;
 import com.example.Qlyhocsinh.dto.request.TeacherUpdateResquest;
 import com.example.Qlyhocsinh.dto.response.SubjectResponse;
 import com.example.Qlyhocsinh.dto.response.TeacherPreviewCreationResponse;
-import com.example.Qlyhocsinh.dto.response.SubjectResponse;
 import com.example.Qlyhocsinh.dto.response.TeacherResponse;
 import com.example.Qlyhocsinh.service.TeacherImportService;
 import com.example.Qlyhocsinh.service.SubjectService;
@@ -80,14 +79,6 @@ public class TeacherController {
     ApiResponse<SubjectResponse> getSubjectByTeacherId(){
         return ApiResponse.<SubjectResponse>builder()
                 .result(subjectService.getSubjectByTeacherId())
-                .build();
-    }
-
-    @CrossOrigin(origins = "http://localhost:5173")
-    @PostMapping("upload-avatar")
-    ApiResponse<TeacherResponse> updateAvatar(@RequestParam("file") MultipartFile file){
-        return ApiResponse.<TeacherResponse>builder()
-                .result(teacherService.updateAvatar(file))
                 .build();
     }
 

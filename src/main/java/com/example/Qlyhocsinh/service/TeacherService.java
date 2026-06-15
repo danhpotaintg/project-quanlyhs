@@ -34,7 +34,6 @@ public class TeacherService {
     private final TeacherMapper teacherMapper;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final FileStorageService fileStorageService;
     private final SubjectRepository subjectRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountService accountService;
@@ -91,44 +90,6 @@ public class TeacherService {
 
     public void deleteTea(String id){
         teacherRepository.deleteById(id);
-    }
-
-    @Transactional
-    @PreAuthorize("hasRole('TEACHER')")
-    public TeacherResponse updateAvatar(MultipartFile file){
-
-        // Lấy username từ token
-        var context = SecurityContextHolder.getContext();
-        String currentUsername = context.getAuthentication().getName();
-
-        //  Tìm teacher theo username
-        Teacher teacher = teacherRepository.findByUserUsername(currentUsername)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-        // Validate file
-        String contentType = file.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
-            throw new RuntimeException("Chỉ cho phép file ảnh (jpg, png...)");
-        }
-
-        if (file.getSize() > 2 * 1024 * 1024) {
-            throw new RuntimeException("File phải nhỏ hơn 2MB");
-        }
-
-        // Lưu file
-        User user = teacher.getUser();
-
-        String fileName = fileStorageService.save(file);
-
-        // Xóa avatar cũ nếu có
-        if (user.getAvatar() != null) {
-            fileStorageService.delete(user.getAvatar());
-        }
-
-        user.setAvatar(fileName);
-        userRepository.save(user);
-
-        return teacherMapper.toTeacherResponse(teacher);
     }
 
 }
