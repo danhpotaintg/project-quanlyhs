@@ -1,6 +1,5 @@
 package com.example.Qlyhocsinh.service;
 
-
 import com.example.Qlyhocsinh.dto.request.StudentRankingRequest;
 import com.example.Qlyhocsinh.dto.request.SemesterAndAcademicYearRequest;
 import com.example.Qlyhocsinh.dto.response.StudentGradeResponse;
@@ -32,12 +31,12 @@ public class StatisticService {
     private final SubjectRepository subjectRepository;
 
     public List<TeacherStatisticResponse> getTeacherStatistics(SemesterAndAcademicYearRequest request){
-        return teacherRepository.getTeacherStatistics(request.getSemester(),request.getAcademicYear());
+        return teacherRepository.getTeacherStatistics(request.getSemester(), request.getAcademicYear());
     }
 
     public List<StudentRankingResponse> getStudentsHighestScoreBySubject(StudentRankingRequest request) {
 
-        // 1. Lấy danh sách các học sinh có điểm cao nhất từ database
+        // Bước 1: Lấy danh sách học sinh từ DB (chưa sort, chỉ lọc đúng môn/kỳ/năm/khóa)
         List<Student> topStudents = studentRepository.findTopStudentsBySubjectAndSemester(
                 request.getSubjectId(),
                 request.getSemester(),
@@ -46,38 +45,41 @@ public class StatisticService {
                 PageRequest.of(0, request.getRankingQuantity())
         );
 
-        // 2. Lấy danh sách cấu hình điểm (GradeConfig) của môn học trong học kỳ và năm học tương ứng
+        // Bước 2: Lấy danh sách cấu hình điểm (GradeConfig) của môn học trong học kỳ và năm học
         List<GradeConfig> gradeConfigs = gradeConfigRepository.findBySubjectIdAndSemesterAndAcademicYear(
                 request.getSubjectId(),
                 request.getSemester(),
                 request.getAcademicYear()
         );
 
-        // Trích xuất danh sách ID của các cấu hình điểm
+        // Bước 3: Trích xuất danh sách ID của các cấu hình điểm để dùng khi truy vấn điểm
         List<Long> configIds = gradeConfigs.stream()
                 .map(GradeConfig::getId)
                 .collect(Collectors.toList());
 
-        // 3. Khởi tạo danh sách rỗng chứa kết quả DTO mới
+        // Bước 4: Khởi tạo danh sách rỗng chứa kết quả trả về
         List<StudentRankingResponse> responseList = new ArrayList<>();
 
-        // 4. Lặp qua từng học sinh trong danh sách top để tính toán
+        // Bước 5: Lặp qua từng học sinh để tính điểm trung bình học kỳ
         for (Student student : topStudents) {
 
-            // Truy vấn toàn bộ các điểm số mà học sinh này đạt được
+            // Lấy toàn bộ điểm của học sinh này theo các cấu hình điểm
             List<Grade> studentGrades = gradeRepository.findByStudentIdAndGradeConfigIdIn(
                     student.getId(),
                     configIds
             );
 
+            // Tử số: tổng (điểm × hệ số)
             double totalWeightedScore = 0.0;
+            // Mẫu số: tổng (số đầu điểm × hệ số)
             double totalExpectedWeight = 0.0;
+
             List<StudentRankingResponse.GradeConfigDetail> configDetails = new ArrayList<>();
 
-            // 5. Duyệt qua từng cấu hình điểm
+            // Bước 6: Duyệt qua từng cấu hình điểm để tính đóng góp vào ĐTB
             for (GradeConfig config : gradeConfigs) {
 
-                // Lọc ra điểm của học sinh khớp với cấu hình hiện tại
+                // Lọc ra các điểm của học sinh thuộc cấu hình hiện tại
                 List<Double> scores = new ArrayList<>();
                 for (Grade g : studentGrades) {
                     if (g.getGradeConfigId().equals(config.getId())) {
@@ -85,26 +87,19 @@ public class StatisticService {
                     }
                 }
 
-                // Tính tổng các điểm của cấu hình này
-                double sumForThisConfig = 0.0;
+                // Công thức đúng: cộng thẳng từng điểm × hệ số vào tử số
+                // Ví dụ thuong_xuyen [8, 9, 9] weight=1 → 8×1 + 9×1 + 9×1 = 26
                 for (Double score : scores) {
-                    sumForThisConfig += score;
+                    totalWeightedScore += score * config.getWeight();
                 }
 
-                // Tính điểm trung bình của cấu hình điểm này (chia cho số đầu điểm quy định)
-                double avgScoreForThisConfig = 0.0;
-                if (config.getMaxEntries() != null && config.getMaxEntries() > 0) {
-                    avgScoreForThisConfig = sumForThisConfig / config.getMaxEntries();
-                }
+                // Mẫu số cộng thêm: số đầu điểm quy định × hệ số
+                // Ví dụ thuong_xuyen maxEntries=3, weight=1 → 3×1 = 3
+                totalExpectedWeight += config.getWeight() * config.getMaxEntries();
 
-                // Cộng dồn điểm và hệ số vào tổng chung
-                totalWeightedScore += (avgScoreForThisConfig * config.getWeight());
-                totalExpectedWeight += config.getWeight();
-
-                // Đóng gói chi tiết điểm theo DTO nội bộ (Inner Class) mới
+                // Đóng gói chi tiết điểm theo từng cấu hình vào DTO
                 StudentRankingResponse.GradeConfigDetail detail = StudentRankingResponse.GradeConfigDetail.builder()
                         .gradeConfigId(config.getId())
-
                         .scoreType(config.getScoreType())
                         .weight(config.getWeight())
                         .maxEntries(config.getMaxEntries())
@@ -114,25 +109,26 @@ public class StatisticService {
                 configDetails.add(detail);
             }
 
-            // 6. Tính điểm trung bình tổng kết học kỳ và làm tròn 2 chữ số thập phân
+            // Bước 7: Tính ĐTB học kỳ = tổng(điểm × hệ số) / tổng(số đầu điểm × hệ số)
+            // Ví dụ: (8+9+9 + 8×2 + 9.5×5) / (3 + 2 + 5) = 89.5 / 10 = 8.95
             double semesterAvg = (totalExpectedWeight > 0) ? (totalWeightedScore / totalExpectedWeight) : 0.0;
+            // Làm tròn 2 chữ số thập phân
             semesterAvg = Math.round(semesterAvg * 100.0) / 100.0;
 
             String className = student.getClassRoom() != null ? student.getClassRoom().getClassName() : "Chưa có lớp";
 
-            // 7. Khởi tạo đối tượng Response MỚI (StudentRankingResponse)
+            // Bước 8: Đóng gói kết quả của học sinh vào DTO response
             StudentRankingResponse studentResponse = StudentRankingResponse.builder()
                     .studentName(student.getFullName())
-                    .className(className)// Lấy tên trực tiếp từ Entity Student
+                    .className(className)
                     .semesterAverage(semesterAvg)
                     .gradeConfigs(configDetails)
                     .build();
 
-            // 8. Thêm học sinh vào danh sách kết quả
             responseList.add(studentResponse);
         }
 
-        // 9. Trả về danh sách xếp hạng
+        // Bước 9: Sort giảm dần theo ĐTB học kỳ trước khi trả về
         return responseList.stream()
                 .sorted((a, b) -> Double.compare(b.getSemesterAverage(), a.getSemesterAverage()))
                 .collect(Collectors.toList());
