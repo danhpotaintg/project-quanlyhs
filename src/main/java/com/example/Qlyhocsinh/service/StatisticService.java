@@ -133,6 +133,8 @@ public class StatisticService {
         }
 
         // 9. Trả về danh sách xếp hạng
-        return responseList;
+        return responseList.stream()
+                .sorted((a, b) -> Double.compare(b.getSemesterAverage(), a.getSemesterAverage()))
+                .collect(Collectors.toList());
     }
 }
